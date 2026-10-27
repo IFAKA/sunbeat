@@ -3,7 +3,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { useRef } from "react";
-import SolarGrid from "./SolarGrid";
+import { Heading, Kicker, Text, SolarGrid } from "./ui";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -22,13 +22,11 @@ export default function Reading() {
   }, { scope: root });
   return (
     <section ref={root} id="never" className="relative h-[240svh]">
-      <div className="sticky top-0 h-svh"><SolarGrid className="!-z-0" /></div>
+      <div className="sticky top-0 h-svh"><SolarGrid flat /></div>
       <div className="sticky top-0 mx-auto -mt-[100svh] flex h-svh max-w-[1080px] flex-col items-center justify-center px-5 py-[56px] text-center">
-        <p className="kicker mb-[2svh] text-sun">Nothing to remember</p>
-        {["charger.", "cable.", "reminder."].map((w) => (
-          <p key={w} className="pl text-[clamp(32px,min(11svh,11vw),104px)] font-semibold leading-[1.06] tracking-[-0.04em]">No {w}</p>
-        ))}
-        <p className="pl-lead mt-[3svh] max-w-[28em] text-[clamp(17px,2.6svh,24px)] leading-snug text-mute">Wear it. Light fills the battery while you do. In a drawer it sleeps and uses almost nothing.</p>
+        <Kicker>Nothing to remember</Kicker>
+        {["charger.", "cable.", "reminder."].map((w, i) => <Heading key={w} level="statement" as="p" mt={i === 0 ? 3 : undefined} className="pl">No {w}</Heading>)}
+        <Text size="lead" tone="mute" measure mt={4} className="pl-lead">Wear it. Light fills the battery while you do. In a drawer it sleeps and uses almost nothing.</Text>
       </div>
     </section>
   );

@@ -1,7 +1,7 @@
 "use client";
 import { useRef, useState } from "react";
 import Stage3D, { type Pose, type Stage3DHandle } from "./Stage3D";
-
+import { Panel, Tabs, Text, Slider, Kicker } from "./ui";
 const CHIPS: [string, string, Pose][] = [
   ["Closed", "The clip as you wear it.", { t: 0, focus: null, yaw: 25, pitch: 12 }],
   ["Exploded", "Every part, apart. Light travels in orange, songs and sound in cyan.", { t: 1, focus: null, yaw: 210, pitch: 18 }],
@@ -17,26 +17,17 @@ export default function Closer() {
   const stage = useRef<Stage3DHandle>(null);
   const [t, setT] = useState(0);
   const [chip, setChip] = useState(0);
+  const pick = (i: number) => { const pose = CHIPS[i][2]; setChip(i); setT(pose.t ?? 0); stage.current?.send({ ...pose, spin: false, reset: true }); };
   return (
     <div className="w-full">
-      <div className="panel relative bg-black">
+      <Panel black className="relative">
         <Stage3D ref={stage} initial={{ t: 0, yaw: 25, pitch: 12, spin: true, snap: true }} className="relative h-[min(72svh,640px)] min-h-[360px] w-full" />
-        <p className="kicker pointer-events-none absolute left-4 top-3 text-[11px] text-mute">Drag to turn / any way</p>
-      </div>
-      <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-        {CHIPS.map(([name, , pose], i) => (
-          <button key={name} onClick={() => { setChip(i); setT(pose.t ?? 0); stage.current?.send({ ...pose, spin: false, reset: true }); }}
-            className={`kicker rounded-sm border px-3.5 py-2 text-[12px] transition ${chip === i ? "border-sun bg-sun/15 text-sun shadow-[0_0_14px_rgba(255,138,0,0.35)]" : "border-white/15 text-paper/80 hover:border-sun/60"}`}>{name}</button>
-        ))}
-      </div>
-      <p className="mx-auto mt-4 min-h-[2.6em] max-w-[34em] text-[clamp(14px,2svh,17px)] text-paper/85">{CHIPS[chip][1]}</p>
-      <label className="mx-auto mt-3 flex max-w-[460px] items-center gap-3 text-[15px] text-mute">
-        <span className="kicker text-[11px]">Closed</span>
-        <input type="range" min={0} max={100} value={Math.round(t * 100)} aria-label="Assemble or exploded" className="h-1 flex-1 accent-[#ffb340]"
-          onChange={(e) => { const v = Number(e.target.value) / 100; setT(v); stage.current?.send({ t: v }); }} />
-        <span className="kicker text-[11px]">Open</span>
-      </label>
-      <p className="kicker mt-2 text-center text-[11px] text-mute">Move slider to open and close.</p>
+        <Kicker tone="mute" size="small" className="pointer-events-none absolute left-4 top-3">Drag to turn / any way</Kicker>
+      </Panel>
+      <Tabs mt={2} items={CHIPS.map((c) => c[0])} value={chip} onChange={pick} />
+      <Text size="lead" tone="soft" measure mt={2} className="mx-auto min-h-[2.6em]">{CHIPS[chip][1]}</Text>
+      <Slider mt={1} value={Math.round(t * 100)} label="Assemble or exploded" start="Closed" end="Open" onChange={(v) => { setT(v / 100); stage.current?.send({ t: v / 100 }); }} />
+      <Text size="label" tone="mute" mt={1} className="text-center">Move slider to open and close.</Text>
     </div>
   );
 }

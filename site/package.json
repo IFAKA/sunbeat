@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "check:ui": "node scripts/check-ui.mjs",
+    "prebuild": "node scripts/check-ui.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

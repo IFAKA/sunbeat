@@ -4,6 +4,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { useEffect, useRef, useState } from "react";
 import Stage3D, { type Pose, type Stage3DHandle } from "./Stage3D";
+import { Heading, Kicker, Text, Dots } from "./ui";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -32,14 +33,13 @@ function poseAt(p: number): Pose {
   const turn = i === 0 ? (p - 1 / N) * 300 : 0; // beat 1: a slow turn that ends at the next pose
   return { t: lerp(prev.t, b.pose.t), yaw: lerp(prev.yaw, b.pose.yaw) + turn, pitch: lerp(prev.pitch, b.pose.pitch), zoom: 1, focus: b.pose.focus ?? null };
 }
-const TONE = { sun: "text-sun", ice: "text-ice" } as const;
 
 /** One pinned screen, nine screens tall. Scroll drives the real 3D model; you can still turn it by hand. */
 export default function Film() {
   const root = useRef<HTMLElement>(null);
   const stage = useRef<Stage3DHandle>(null);
   const caps = useRef<(HTMLDivElement | null)[]>([]);
-  const dots = useRef<(HTMLSpanElement | null)[]>([]);
+  const dots = useRef<(HTMLElement | null)[]>([]);
   const [still, setStill] = useState(false);
   useEffect(() => setStill(matchMedia("(prefers-reduced-motion: reduce)").matches), []);
 
@@ -67,7 +67,7 @@ export default function Film() {
     <section id="film" className="mx-auto max-w-[900px] px-5 py-24 text-center">
       <Stage3D ret={0} initial={{ t: 1, yaw: 215, pitch: 18, snap: true }} className="relative h-[60svh] w-full" />
       <div className="mt-10 space-y-10">
-        {BEATS.map((b) => <div key={b.h}><p className={`kicker ${TONE[b.tone]}`}>{b.k}</p><h2 className="mt-2 text-4xl font-semibold tracking-[-0.03em]">{b.h}</h2><p className="mx-auto mt-3 max-w-[30em] text-lg text-mute">{b.d}</p></div>)}
+        {BEATS.map((b) => <div key={b.h}><Kicker tone={b.tone}>{b.k}</Kicker><Heading level="beat" mt={1}>{b.h}</Heading><Text size="lead" tone="mute" measure mt={2} className="mx-auto">{b.d}</Text></div>)}
       </div>
     </section>
   );
@@ -80,16 +80,14 @@ export default function Film() {
           <div className="relative h-full">
             {BEATS.map((b, i) => (
               <div key={b.h} ref={(el) => { caps.current[i] = el; }} style={{ opacity: i === 0 ? 1 : 0 }} className="absolute inset-x-5 top-[calc(48px+3svh)] md:left-[max(20px,calc((100vw-1080px)/2+20px))] md:right-4 md:top-1/2 md:-translate-y-1/2">
-                <p className={`kicker ${TONE[b.tone]}`}>{b.k}</p>
-                <h2 className={`mt-[1.2svh] text-[clamp(30px,min(9vw,6.2svh),64px)] font-semibold leading-[1.05] tracking-[-0.035em] md:text-[clamp(36px,4.4vw,62px)] ${b.tone === "ice" ? "glow-ice" : "glow-sun"}`}>{b.h}</h2>
-                <p className="mt-[1.4svh] max-w-[26em] text-[clamp(14px,2.1svh,19px)] leading-snug text-mute">{b.d}</p>
+                <Kicker tone={b.tone}>{b.k}</Kicker>
+                <Heading level="beat" glow={b.tone} mt={1}>{b.h}</Heading>
+                <Text size="lead" tone="mute" mt={2} className="max-w-[26em]">{b.d}</Text>
               </div>
             ))}
           </div>
         </div>
-        <div aria-hidden className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
-          {BEATS.map((_, i) => <span key={i} ref={(el) => { dots.current[i] = el; }} className="block h-1 w-1.5 rounded-full bg-paper/30 transition-all duration-300 [&.on]:w-6 [&.on]:bg-sun [&.on]:shadow-[0_0_8px_var(--color-sun)]" />)}
-        </div>
+        <Dots count={N} refCb={(i, el) => { dots.current[i] = el; }} />
       </div>
     </section>
   );

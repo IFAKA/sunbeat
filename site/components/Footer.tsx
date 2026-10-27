@@ -1,9 +1,11 @@
 import { REPO } from "./Nav";
+import { Section, Text, Link } from "./ui";
+
 export default function Footer() {
   return (
-    <footer className="mx-auto max-w-[1080px] border-t border-line px-5 py-8 text-xs leading-relaxed text-mute">
-      <p>Sunbeat is a working name for a concept. It is not for sale. Hours and light numbers are estimates until measured.</p>
-      <p className="mt-2"><a href="/build" className="hover:text-paper">3D model</a> · <a href="/docs" className="hover:text-paper">Docs</a> · <a href={REPO} className="hover:text-paper">GitHub</a> · MIT</p>
-    </footer>
+    <Section as="footer" variant="bar">
+      <Text size="fine">Sunbeat is a working name for a concept. It is not for sale. Hours and light numbers are estimates until measured.</Text>
+      <Text size="fine" mt={1}><Link variant="quiet" href="/build">3D model</Link> · <Link variant="quiet" href="/docs">Docs</Link> · <Link variant="quiet" href={REPO}>GitHub</Link> · MIT</Text>
+    </Section>
   );
 }

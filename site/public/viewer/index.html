@@ -5,9 +5,10 @@
 <title>Build viewer: see it before you buy</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
+  @font-face { font-family:Inter; font-style:normal; font-weight:100 900; font-display:block; src:url(/fonts/Inter.woff2) format("woff2"); }
   :root { --bg:#dde3ea; --ink:#1b2430; --side:#f6f8fa; --line:#c5cdd6; --acc:#1f6feb; }
   * { box-sizing: border-box; }
-  html, body { margin:0; height:100%; font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif; color:var(--ink); font-size:14px; }
+  html, body { margin:0; height:100%; font-family:Inter, system-ui, sans-serif; color:var(--ink); font-size:14px; }
   #app { display:flex; height:100vh; }
   #side { width:310px; flex:none; background:var(--side); border-right:1px solid var(--line); overflow-y:auto; padding:12px; }
   #side h1 { font-size:16px; margin:0 0 8px; }
@@ -56,7 +57,7 @@
 
   /* Dark look, same as the landing page */
   :root { --bg:#000; --ink:#f5f5f7; --side:#0b0b0c; --line:#2c2c2e; --acc:#2997ff; }
-  html, body { background:#000; font-family: Inter, -apple-system, "SF Pro Text", "Segoe UI", Roboto, Arial, sans-serif; -webkit-font-smoothing:antialiased; letter-spacing:-0.01em; }
+  html, body { background:#000; font-family:Inter, system-ui, sans-serif; -webkit-font-smoothing:antialiased; letter-spacing:-0.01em; }
   button { background:#1c1c1e; color:#f5f5f7; border-radius:980px; border-color:#2c2c2e; }
   button:hover { border-color:#2997ff; }
   button.on { background:#0071e3; border-color:#0071e3; color:#fff; }
@@ -152,6 +153,8 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 import { P, BB, hole, stage3, stage4, COMPARE, sizeText } from './parts.js';
+// One font: canvas text needs Inter loaded before any texture is drawn.
+try { await Promise.all([400, 600, 700, 800].map((w) => document.fonts.load(`${w} 20px Inter`))); } catch (e) {}
 let DEV = stage4.dev, PCBL = stage4.pcbl, PLMAP = {}; // current device (set per stage)
 const useDev = (def) => { if (def.dev) { DEV = def.dev; PCBL = def.pcbl; PLMAP = Object.fromEntries(PCBL.parts.map((p) => [p.id, p])); } };
 
@@ -186,7 +189,7 @@ function textLines(lines, wmm, lmm, fontMm, fg = '#e8e8ee', bg = null) {
   const S = 60; const W = Math.round(wmm * S), H = Math.round(lmm * S);
   return canvasTex(W, H, (x) => {
     if (bg) { x.fillStyle = bg; x.fillRect(0, 0, W, H); }
-    x.fillStyle = fg; x.textAlign = 'center'; x.textBaseline = 'middle'; x.font = `bold ${fontMm * S}px sans-serif`;
+    x.fillStyle = fg; x.textAlign = 'center'; x.textBaseline = 'middle'; x.font = `bold ${fontMm * S}px Inter, system-ui, sans-serif`;
     const lh = fontMm * S * 1.2; const y0 = H / 2 - (lines.length - 1) * lh / 2;
     lines.forEach((t, i) => x.fillText(t, W / 2, y0 + i * lh, W * 0.95));
   });
@@ -276,7 +279,7 @@ const BUILD = {
       const sq = (cx, cz) => x.fillRect(px(cx) - 0.5 * S, pz(cz) - 0.5 * S, 1.0 * S, 1.0 * S);
       for (let c = 0; c < 30; c++) 'abcdefghij'.split('').forEach((r) => { const [hx, hz] = hole(c, r); sq(hx, hz); });
       for (let c = 0; c < 30; c++) if (c % 6 !== 5) [-24.77, -22.23, 22.23, 24.77].forEach((z) => sq((c - 14.5) * P, z));
-      x.fillStyle = '#555'; x.font = `bold ${1.3 * S}px sans-serif`; x.textAlign = 'center'; x.textBaseline = 'middle';
+      x.fillStyle = '#555'; x.font = `bold ${1.3 * S}px Inter, system-ui, sans-serif`; x.textAlign = 'center'; x.textBaseline = 'middle';
       for (let c = 0; c < 30; c++) { const lab = String(c + 1); x.fillText(lab, px((c - 14.5) * P), pz(-16.6)); x.fillText(lab, px((c - 14.5) * P), pz(16.6)); }
       'abcdefghij'.split('').forEach((r) => { const z = BB.rows[r]; x.fillText(r, px(-14.5 * P - 3.4), pz(z)); x.fillText(r, px(14.5 * P + 3.4), pz(z)); });
     });
@@ -300,7 +303,7 @@ const BUILD = {
         if (hi) { x.fillStyle = hi; x.beginPath(); x.arc(u(px_), v(pz_), 1.45 * S, 0, 7); x.fill(); }
         x.fillStyle = '#d4af37'; x.beginPath(); x.arc(u(px_), v(pz_), 0.9 * S, 0, 7); x.fill(); x.fillStyle = '#111'; x.beginPath(); x.arc(u(px_), v(pz_), 0.45 * S, 0, 7); x.fill();
       };
-      x.font = `bold ${1.35 * S}px sans-serif`; x.textBaseline = 'middle';
+      x.font = `bold ${1.35 * S}px Inter, system-ui, sans-serif`; x.textBaseline = 'middle';
       for (let i = 0; i < 20; i++) {
         const px_ = -24.13 + i * P;
         const hiL = i === 19 ? '#ff7a00' : i === 17 ? '#222222' : null; // pin 20 (GP15) orange, pin 18 (GND) dark
@@ -314,7 +317,7 @@ const BUILD = {
         void j;
       }
       // pin numbers 1 and 20 on the bottom row
-      x.fillStyle = '#ffffff'; x.font = `bold ${1.1 * S}px sans-serif`; x.textAlign = 'center';
+      x.fillStyle = '#ffffff'; x.font = `bold ${1.1 * S}px Inter, system-ui, sans-serif`; x.textAlign = 'center';
       x.fillText('1', u(-24.13), v(10.0)); x.fillText('20', u(24.13 - 0), v(10.0));
     });
     const top = plane(tex, L, W, 'y'); top.position.y = T / 2 + 0.01; g.add(top);
@@ -487,7 +490,7 @@ const BUILD = {
         const n = 8, gap = 0.5 * S, ww = (c.width - 2 * 1.5 * S - (n - 1) * gap) / n;
         for (let i = 0; i < n; i++) x.fillRect(1.5 * S + i * (ww + gap), y0 + 1.5 * S, ww, th - 3 * S);
         x.fillStyle = '#9a9a9f'; x.fillRect(0, y0, c.width, 1.0 * S); x.fillRect(0, y0 + th - 1.0 * S, c.width, 1.0 * S);
-        x.fillStyle = '#e8e8ee'; x.font = `bold ${2.2 * S}px sans-serif`; x.textAlign = 'center'; x.textBaseline = 'middle';
+        x.fillStyle = '#e8e8ee'; x.font = `bold ${2.2 * S}px Inter, system-ui, sans-serif`; x.textAlign = 'center'; x.textBaseline = 'middle';
         x.fillText(b.label, c.width / 2, y0 + th / 2, c.width * 0.8);
       }
       if (T > 1) { x.fillStyle = '#ddd'; for (let k = 1; k < T; k++) x.fillRect(0, k * th - 0.15 * S, c.width, 0.3 * S); }
@@ -581,9 +584,9 @@ const BUILD = {
     g.add(at(box(b.w, b.pcb, b.d, '#b3262b', { r: 0.5 }), 0, pcbY, 0));
     const S = 30; const W = Math.round(b.w * S), H = Math.round(b.d * S);
     const tex = canvasTex(W, H, (x) => {
-      x.fillStyle = '#fff'; x.font = `bold ${1.5 * S}px sans-serif`; x.textAlign = 'center'; x.textBaseline = 'middle';
+      x.fillStyle = '#fff'; x.font = `bold ${1.5 * S}px Inter, system-ui, sans-serif`; x.textAlign = 'center'; x.textBaseline = 'middle';
       ['T', 'R1', 'R2', 'S'].forEach((t, k) => x.fillText(t, W / 2 + (k - 1.5) * b.pitch * S, (pinZ + 2.4 + b.d / 2) * S));
-      x.font = `bold ${1.2 * S}px sans-serif`; x.fillStyle = '#ffd9d9'; x.fillText('TIP  RING1  RING2  SLEEVE', W / 2, (pinZ + 4.2 + b.d / 2) * S);
+      x.font = `bold ${1.2 * S}px Inter, system-ui, sans-serif`; x.fillStyle = '#ffd9d9'; x.fillText('TIP  RING1  RING2  SLEEVE', W / 2, (pinZ + 4.2 + b.d / 2) * S);
     });
     const top = plane(tex, b.w, b.d, 'y'); top.position.set(0, y0 + b.spacer + b.pcb + 0.01, 0); g.add(top);
     const pcbTop = y0 + b.spacer + b.pcb;
@@ -853,7 +856,7 @@ function wiringSvg() {
   const Y = (z) => 300 + z * mmx;
   const rows = BB.rows;
   const hx = (c) => X(c), hy = (r) => Y(rows[r]);
-  let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 690" font-family="Arial, sans-serif">
+  let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 690" font-family="Inter, system-ui, sans-serif">
   <rect width="900" height="690" fill="#fff"/>
   <text x="450" y="26" font-size="18" font-weight="700" text-anchor="middle">How to wire it (top view of the breadboard)</text>
   <rect x="${X(0) - 4.4 * mmx}" y="${Y(-27.5)}" width="${BB.w * mmx}" height="${55 * mmx}" rx="8" fill="#ece9de" stroke="#9a968a" stroke-width="2"/>
@@ -923,7 +926,7 @@ function pcbSvg() {
   const notes = ['Solid line = this layer. Dashed = the other layer.', 'Ground (GND) = copper fill on both sides, not drawn.', 'Jack: T tip, R1 ring 1, R2 ring 2 (ground), S sleeve.',
     'USB 5 V (VBUS) goes only to the USB chip. The battery never feeds it.', 'USB emergency charging: not designed yet.', 'Song memory needs 2.7 V. Its power is not routed yet.', 'Check every pad shape against its datasheet first.'];
   const ly = oy + h * sc + 58; const H = ly + 30 + Math.max(nets.length * 20, notes.length * 20) + 20;
-  let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 ${H}" font-family="Arial, sans-serif">
+  let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 ${H}" font-family="Inter, system-ui, sans-serif">
   <rect width="980" height="${H}" fill="#fff"/>
   <text x="490" y="30" font-size="19" font-weight="700" text-anchor="middle">${ST[S.stage].def.title}: circuit board plan, drawn at real size (2 layers, ${ST[S.stage].def.parts.find((q) => q.id === 'pcb').size[2]} mm)</text>
   <rect x="190" y="42" width="600" height="28" rx="6" fill="#fff1d6" stroke="#d18a00"/>

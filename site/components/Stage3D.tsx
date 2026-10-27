@@ -1,4 +1,5 @@
 "use client";
+import { StageFrame, StagePoster } from "./ui";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 
 /** What the viewer understands (see public/viewer/index.html, "embed mode"). */
@@ -47,25 +48,12 @@ const Stage3D = forwardRef<Stage3DHandle, { drag?: boolean; keepSpin?: boolean; 
     return () => window.removeEventListener("message", on);
   }, [near, post, onMarks]);
 
+  const src = `/viewer/index.html?embed=1${drag ? "&drag=1" : ""}${keepSpin ? "&keepspin=1" : ""}${ret ? `&ret=${ret}` : ""}${marks ? `&marks=${marks.join(",")}` : ""}#stage=4`;
   return (
     <div ref={box} className={className}>
-      <Poster hide={ok} />
-      {near && (
-        <iframe ref={frame} title={title} src={`/viewer/index.html?embed=1${drag ? "&drag=1" : ""}${keepSpin ? "&keepspin=1" : ""}${ret ? `&ret=${ret}` : ""}${marks ? `&marks=${marks.join(",")}` : ""}#stage=4`} loading="lazy" tabIndex={-1}
-          style={{ colorScheme: "dark", maskImage: MASK, WebkitMaskImage: MASK, maskComposite: "intersect", WebkitMaskComposite: "source-in" }}
-          className={`absolute inset-0 size-full border-0 transition-opacity duration-700 ${ok ? "opacity-100" : "opacity-0"} ${drag ? "" : "pointer-events-none"}`} />
-      )}
+      <StagePoster hide={ok} />
+      {near && <StageFrame frameRef={frame} src={src} title={title} ok={ok} drag={drag} />}
     </div>
   );
 });
-const MASK = "linear-gradient(to right, transparent, #000 15%, #000 85%, transparent), linear-gradient(to bottom, transparent, #000 5%, #000 95%, transparent)";
 export default Stage3D;
-
-/** Shown while the 3D page loads: only a soft sun glow, no drawing of the device. */
-function Poster({ hide }: { hide: boolean }) {
-  return (
-    <div aria-hidden className={`absolute inset-0 grid place-items-center transition-opacity duration-700 ${hide ? "opacity-0" : "opacity-100"}`}>
-      <div className="breathe size-24 rounded-full bg-[radial-gradient(closest-side,rgba(255,138,0,0.35),transparent)]" />
-    </div>
-  );
-}
