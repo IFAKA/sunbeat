@@ -15,7 +15,7 @@ const HIGHLIGHTS = [
   [Battery, "Solar, indoors", "10.8 cm² cell made for room light. No cable, ever."],
   [Music, "Your real songs", "About 150 songs, 9 hours, stored on the clip."],
   [Headphones, "Your earbuds", "Any wired earbuds. A round 3.5 mm plug."],
-  [MousePointerClick, "One button", "Click, two, three, hold. No screen."],
+  [MousePointerClick, "Your earbud button", "Click, two, three, hold. No screen."],
   [Cable, "USB-C to add songs", "Drag songs in on a laptop. That is the only cable."],
   [ClipboardCheck, "Open and honest", "Every number is labelled: measured or estimate."],
 ] as const;
