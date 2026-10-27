@@ -73,11 +73,13 @@ Done by web search and page loads. DigiKey and Farnell block scripts, so their o
 | AEM10941-QFN | Exists, in stock at Mouser (about 7,500 on the UK page) | DigiKey does not list it. |
 | W25N01GVZEIG flash | Exists, LCSC shows about 1,300 in stock | Spain shipping not checked. |
 | Artemis module WRL-15484 | SparkFun still sells it; Pimoroni dropped it, Amazon UK unavailable | Buy it at SparkFun. Live stock not confirmed. |
-| ML2032 (Jauch) | Listed at DigiKey, but 22 weeks lead time and a notice that air shipping is not available | RISK. Maxell ML2032 is sold on eBay, Amazon and Console5 as a backup. Find a second source before you order. |
+| ML2032 (Jauch) | Listed at DigiKey, but 22 weeks lead time and a notice that air shipping is not available | RISK. Maxell ML2032 is sold on eBay, Amazon and Console5 as a backup. Second source found: Farnell ML 2032 T26 (order code 3032012, about GBP 4.78, the UK page did not confirm stock) and batterijservice.nl (EUR 2.95, page about 2 years old). Check live stock before you order. |
 | Keystone 3034TR holder | Exists, over 100,000 in stock on DigiKey sites | OK |
 | SJ-43514-SMT-TR jack | Exists, about 8,000 to 13,000 in stock on DigiKey.com | OK |
-| CH340E | LCSC page loads | Stock number not read. |
+| CH340E | Exists, LCSC shows 14,000 to 57,000 in stock (pages differ) | OK. Not at Mouser or DigiKey. |
 | Resistors, capacitors, inductor, USB-C, button | Not checked one by one | Common parts. DigiKey search links are not verified. |
+
+Shipping to Spain: Mouser.es is confirmed (prices include duty, free shipping over about EUR 75, per its own page). Farnell and LCSC Spain terms were not found. Check the cart before paying.
 
 ## Power check (datasheet numbers)
 
