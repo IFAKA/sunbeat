@@ -95,7 +95,7 @@ export default function Home() {
           <Reveal delay={0.1} className="mt-[3svh] w-full">
             <a href="/build" className="group block overflow-hidden rounded-[22px] border border-line bg-black">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/inside.png" alt="Exploded 3D view of the Sunbeat clip with every part named" className="w-full transition-transform duration-700 group-hover:scale-[1.015]" />
+              <img src="/inside.png" alt="The Sunbeat clip pulled apart: case, solar cell, circuit board, coin cell and clip" className="w-full transition-transform duration-700 group-hover:scale-[1.015]" />
             </a>
           </Reveal>
           <Reveal delay={0.2}><a href="/build" className="mt-[3svh] inline-block rounded-full bg-sun px-6 py-3 text-[17px] font-semibold text-black hover:brightness-110">Open the 3D model</a></Reveal>
