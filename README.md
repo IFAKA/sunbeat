@@ -28,14 +28,18 @@ Sound comes from one pin (1-bit PWM) through a resistor and a capacitor. The ear
 
 ## The numbers (design, not measured)
 
-| | Mini | Big |
-|---|---|---|
-| Size | 44.0 × 32.6 × 10.8 mm | 44.4 × 55.2 × 11.2 mm |
-| Solar cell | 10.8 cm², ~74 µW at 200 lux | 21.6 cm², ~149 µW |
-| Battery | 1 × ML2032, 195 mWh | 2 × ML2032, 390 mWh |
-| Songs from room light | about 1.5 h/day | about 3 h/day |
-| Song memory | 128 MB, about 9 h | same |
-| Parts cost (ex VAT, no PCB or case) | ~78 € | ~88 € |
+| | Sunbeat |
+|---|---|
+| Size | 44.4 × 55.2 × 11.2 mm |
+| Solar cell | 21.6 cm², ~149 µW at 200 lux |
+| Battery | 2 × ML2032, 390 mWh |
+| Songs from room light | about 3 h/day |
+| Song memory | 128 MB, about 9 h |
+| Parts cost (ex VAT, no PCB or case) | ~88 € |
+
+**Travel and commute.** The battery is the buffer; the solar cell only refills it over days. Playing costs about 0.5 mW, so 390 mWh is about 490 h of music even with no light. A 10 h travel day uses about 1.3% of the battery. A normal commute (1-2 h) is far below the 3 h/day the room light pays for. Clip it on the outside of a bag or jacket so it also charges outdoors, where light is 10 to 100 times brighter than indoors. If it stays in a pocket, it still plays from the battery.
+
+**Where "3 h/day" comes from.** It is the user-given typical listening time (about 3 h/day, a median). I have not found or checked a published source for it yet, so treat it as an assumption. The harvest side is computed from the Panasonic AMG-1401C datasheet (74.3 µW per cell at 200 lux), see [the parts list](https://sunbeat-black.vercel.app/docs/bom).
 
 Chosen from common parts sold in Spain (Panasonic AMG-1401C cell, Ambiq Apollo3 module, AEM10941 harvester, Winbond W25N01GV flash). See [the parts list](https://sunbeat-black.vercel.app/docs/bom).
 

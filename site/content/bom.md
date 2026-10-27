@@ -17,7 +17,7 @@ All Amazon.es links come from search results only. I could not open the pages, s
 
 Warnings: the TRRS boards may come with loose header pins (soldering needed) and I do not know their pin order. Check the photos. No board with a ready 4-pin header was confirmed. The simplest basket is the HUAREW kit + one TRRS pack + resistor/capacitor kit or loose parts, about EUR 25 to 30 in total (estimate from snippets).
 
-## Step 4 mini (1 solar cell, 1 coin cell)
+## Step 4 final device (table lists 1 solar cell and 1 coin cell; the changes for 2 follow it)
 
 | Part | What it does | Exact part number | Qty to buy (spares) | Best shop for Spain | Unit price | Stock seen | URL | Lifecycle |
 |---|---|---|---|---|---|---|---|---|
@@ -49,26 +49,26 @@ Warnings: the TRRS boards may come with loose header pins (soldering needed) and
 Parts total ex VAT (with spares, without PCB, case, shipping): about EUR 78 (includes the song memory at DigiKey.es price, 2 x EUR 13.77 = EUR 27.5; at LCSC prices about EUR 8 to 10 less; some small parts at an assumed EUR 0.05 to 0.15 each).
 
 Suggested baskets (no single shop has everything):
-1. DigiKey.es: all passives, C8, inductors, jack, USB-C, button, ML2032, holder (and the Artemis if you prefer it here). About EUR 23.4 ex VAT without the song memory (add EUR 27.5 if the flash is bought here too), about EUR 28 with VAT. Under EUR 75 you pay EUR 25 shipping, so order mini and big together or add the PCB parts you need later.
+1. DigiKey.es: all passives, C8, inductors, jack, USB-C, button, ML2032, holder (and the Artemis if you prefer it here). About EUR 23.4 ex VAT without the song memory (add EUR 27.5 if the flash is bought here too), about EUR 28 with VAT. Under EUR 75 you pay EUR 25 shipping, so add the PCB parts you need later.
 2. Farnell: AMG-1401C (about EUR 17 for 2). Shipping to Spain NOT checked.
 3. Mouser: AEM10941-QFN (about EUR 8 for 2). Shipping NOT checked. Mouser may also stock most of the DigiKey list, but I could not load it.
 4. LCSC: CH340E (about EUR 1) and the song memory W25N01GVZEIG (about EUR 15 to 20 for 2). Shipping NOT checked. Alternative: any shop that sells CH340E in MSOP-10.
 5. SparkFun: Artemis module (USD 9.95), if not bought at DigiKey.
 
-## Step 4 big (2 solar cells, 2 coin cells)
+## Step 4 final device: changes for 2 solar cells and 2 coin cells
 
-Same table as mini, with these changes: AMG-1401C 3 pieces (2 used + 1 spare), ML2032 3 pieces, holder 3 pieces. The song memory and C8 rows are the same as in mini (2 flash chips, 3 caps). All other lines are the same.
+Start from the table above, with these changes: AMG-1401C 3 pieces (2 used + 1 spare), ML2032 3 pieces, holder 3 pieces. The song memory and C8 rows are unchanged (2 flash chips, 3 caps). All other lines are the same.
 
-Parts total ex VAT (with spares, without PCB, case, shipping): about EUR 88 (mini total plus EUR 10.5 for the second cell, holder and solar cell, as before).
+Parts total ex VAT (with spares, without PCB, case, shipping): about EUR 88 (one-cell total plus EUR 10.5 for the second cell, holder and solar cell).
 
-Basket: same shops as mini. DigiKey.es part: about EUR 25 ex VAT. Order big + mini together from DigiKey (about EUR 50 ex VAT, about EUR 60 with VAT): still under EUR 75, so add what is missing for the PCB order.
+Basket: same shops as above. DigiKey.es part: about EUR 25 ex VAT. Add what is missing for the PCB order.
 
 ## Power check (datasheet numbers)
 
 - AEM10941: solar input at most 5 V (5.5 V absolute max), cold start 380 mV. AMG-1401C: 2.7 V open circuit at 200 lux (2.3 V minimum), about 2.9 V at 1000 lux, estimated 3.6 to 4 V outdoors (the datasheet curve stops at 1000 lux). OK.
 - Battery limits set by R1 to R6: full at 3.11 V (ML2032 charges at 2.8 to 3.2 V), empty at 2.30 V (chip needs 2.2 V or more), output about 1.92 V (allowed range 1.8 V to empty-limit minus 0.3 V). OK.
 - Capacitors follow the datasheet: CSRC 10 uF, CBOOST 22 uF, CBUCK 10 uF, CHV and CLV 10 uF (allowed 8 to 14 uF). No CBATT needed with a battery.
-- Power at 200 lux: 74.3 uW per cell (mini), 148.6 uW (big). The player needs about 500 uW while playing.
+- Power at 200 lux: 74.3 uW per cell, 148.6 uW for the two cells. The player needs about 500 uW while playing.
 
 ## Song memory warning (found while checking)
 

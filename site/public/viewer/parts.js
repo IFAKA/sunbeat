@@ -192,8 +192,7 @@ export const stage3 = {
 };
 
 
-// ---------------------------------------------------------------- STAGE 4: the final device (big and mini)
-// ---------------------------------------------------------------- STAGE 4: the final device (big and mini)
+// ---------------------------------------------------------------- STAGE 4: the final device
 const DK = (pn) => 'https://www.digikey.es/en/products/result?keywords=' + pn;
 const SRC_AEM = 'https://e-peas.com/wp-content/uploads/2024/09/ds-aem10941_qfn28-v2-1.pdf';
 const SRC_USBC = 'https://www.digikey.es/en/products/result?keywords=USB4105-GF-A (GCT drawing: 8.94 wide x 7.35 deep x 3.31 high; EUR 0.71 ex VAT; lifecycle: active)';
@@ -365,7 +364,7 @@ const NETS = {
   reset: { color: '#f060b0', name: 'USB chip -> Artemis reset and boot' },
 };
 
-// ---------------------------------------------------------------- shared layout (mini = 41.4 x 30 board; big = same plus a second cell and battery, 41.4 x 52.2)
+// ---------------------------------------------------------------- shared layout (41.4 x 52.2 board, two solar cells, two batteries)
 const AMG = (tiles) => ({ model: tiles > 1 ? '2 x Panasonic Amorton AMG-1401C' : 'Panasonic Amorton AMG-1401C', label: 'AMG-1401C', w: 41.4, h: 26.1 * tiles, t: 1.3, tiles,
   source: 'https://industry.panasonic.eu/products/energy-building/amorphous-solar-cells/amorton-indoor-environment (datasheet: 41.4 x 26.1 x 1.3 mm max; at 200 lux Voc 2.7 V (min 2.3), Isc 43.3 uA, Vpm 2.1 V, Ipm 35.4 uA, Pm 74.3 uW each). Shop: Farnell order code 4531800 (at.farnell.com page: 1,177 in stock, EUR 8.63; Spain page not checked); lifecycle: active.' + (tiles > 1 ? ' Two cells side by side, joined in parallel.' : '') });
 
@@ -448,14 +447,14 @@ const battExtra = (n) => ({ group: G_POWER, name: 'Rechargeable coin cell ML2032
   role: 'Stores the energy so the player works in the dark. It loses very little energy when it just sits and needs no protection board. Charge limit 3.2 V; the harvester stops at 3.11 V.',
   build: { kind: 'coin' }, dimText: 'cell 20.0 mm round x 3.2 mm; holder about 21 x 21 mm (outline estimated); 4.2 mm in total',
   source: 'https://www.digikey.es/en/products/result?keywords=ML2032 (Jauch/Maxell ML2032, 3 V, 65 mAh, 20.0 mm x 3.2 mm; 2,000 in stock, EUR 1.45 ex VAT; lifecycle: active) in a Keystone 3034 SMD holder (https://www.digikey.es/en/products/result?keywords=3034TR; 44,448 in stock, EUR 0.53; lifecycle: active). Holder outline not checked.' });
-const L_MINI = layout(0, false), L_BIG = layout(11.1, true);
+const L_BIG = layout(11.1, true);
 const COMMON_CUTS = (PL, ZB) => [
   { id: 'jack', side: 'x+', at: PL.jack.y, z: ZB - 2.5, a: 5.0, b: 4.2 },
   { id: 'usbc', side: 'y+', at: PL.usbc.x, z: ZB - 1.655, a: 9.4, b: 3.7 },
 ];
 
 const big = makeDevice({
-  id: 4, title: 'Step 4: big',
+  id: 4, title: 'Step 4: final device',
   intro: 'A clip-on badge that charges itself from room light. Two solar cells make the front. Two coin cells store the energy. All other parts are on the back of one small circuit board. A USB-C socket lets you add songs from your laptop. A song memory chip keeps about 9 hours of your real songs. Real songs are the main mode. Chiptune is the backup when the battery is low.',
   pcbRole: 'Holds and connects all the small parts. Tall parts are on the back; small parts are on both sides; the solar cells sit 1.5 mm in front of the board.',
   wall: 1.2, R: 5, winR: 2.5, cell: AMG(2), pcb: { w: 41.4, h: 52.2, t: 0.8, corner: 4 }, space: 5.2, frontGap: 1.5,
@@ -467,30 +466,15 @@ const big = makeDevice({
   camFront: { pos: [60, 30, 90], target: [0, 0, 5] },
 });
 
-const mini = makeDevice({
-  id: 5, title: 'Step 4: mini',
-  intro: 'The same circuit, packed small. One solar cell on the front, one coin cell, and small parts on both sides of the board. A USB-C socket lets you add songs from your laptop. A song memory chip keeps about 9 hours of your real songs. Real songs are the main mode. Chiptune is the backup when the battery is low.',
-  pcbRole: 'Holds and connects all the small parts. Tall parts are on the back; small parts are on both sides; the solar cell sits 1.5 mm in front of the board.',
-  wall: 1.0, R: 3.5, winR: 2.0, cell: AMG(1), pcb: { w: 41.4, h: 30.0, t: 0.8, corner: 1.5 }, space: 5.2, frontGap: 1.5,
-  parts: L_MINI.parts, extra: { battery: battExtra(0) },
-  frontPads: L_MINI.frontPads, solarNote: [-12, 5], vias: L_MINI.vias, traces: L_MINI.traces,
-  clip: { w: 10, len: 24, y1: 12 }, cuts: COMMON_CUTS,
-  camera: { pos: [-50, 32, -70], target: [0, 0, 5] },
-  camExploded: { pos: [-95, 55, -120], target: [0, 0, 8] },
-  camFront: { pos: [36, 20, 56], target: [0, 0, 5] },
-});
-
-// comparison numbers (big vs mini)
+// final device numbers
 const cmp = (d, cellArea, uW, mwh, bat, songMem, songDay) => ({ songMem, songDay, outW: d.outW, outH: d.outH, outD: d.outD, totalD: d.totalD, volume: d.volume, cellArea, uW, mwh, bat });
 export const COMPARE = {
   big: cmp(big.DEV, (41.4 * 52.2) / 100, 2 * 74.3, 3 * 130, '2 x ML2032, 65 mAh each, 3 V', '128 MB, about 9 h', 'about 3 h'),
-  mini: cmp(mini.DEV, (41.4 * 26.1) / 100, 74.3, 3 * 65, 'ML2032, 65 mAh, 3 V', '128 MB, about 9 h', 'about 1.5 h'),
 };
 
 export const DEV = big.DEV;
 export const PCBL = big.PCBL;
 export const stage4 = big.stage;
-export const stage5 = mini.stage;
 
 // Shorthands for size text
 export const sizeText = (p) => {

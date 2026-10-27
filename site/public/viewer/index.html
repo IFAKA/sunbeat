@@ -109,8 +109,7 @@
   <aside id="side">
     <div class="seg" id="tabs">
       <button id="tab3">Desk test</button>
-      <button id="tab4">Big</button>
-      <button id="tab5">Mini</button>
+      <button id="tab4">Final device</button>
     </div>
     <div class="seg">
       <button id="vNormal">Normal</button>
@@ -132,7 +131,7 @@
     <div id="size4"></div>
     <div id="card"></div>
     <div id="scalehint"></div>
-    <div id="road"><div class="bar"><span>Roadmap: 4 steps to the final mini</span><button id="roadClose">Close</button></div><div id="roadBody"></div></div>
+    <div id="road"><div class="bar"><span>Roadmap: 4 steps to the final device</span><button id="roadClose">Close</button></div><div id="roadBody"></div></div>
     <div id="panel"><div class="bar"><span id="panelTitle"></span><button id="panelClose">Close picture</button></div><div id="panelBody"></div></div>
   </div>
 </div>
@@ -141,7 +140,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
-import { P, BB, hole, stage3, stage4, stage5, COMPARE, sizeText } from './parts.js';
+import { P, BB, hole, stage3, stage4, COMPARE, sizeText } from './parts.js';
 let DEV = stage4.dev, PCBL = stage4.pcbl, PLMAP = {}; // current device (set per stage)
 const useDev = (def) => { if (def.dev) { DEV = def.dev; PCBL = def.pcbl; PLMAP = Object.fromEntries(PCBL.parts.map((p) => [p.id, p])); } };
 
@@ -656,7 +655,7 @@ function buildStage(def) {
   root.add(grid);
   ST[def.id] = { def, root, parts, grid, ticks: grid.children.filter((c) => c.isCSS2DObject) };
 }
-buildStage(stage3); buildStage(stage4); buildStage(stage5);
+buildStage(stage3); buildStage(stage4);
 
 // ------------------------------------------------------------------ state + UI
 const S = { road: false, stage: 3, view: 'normal', panel: false, cam: 'back', names: true, minor: false, grid: true, see: true, t: 0, target: 0, pinned: null, hovered: null };
@@ -759,7 +758,7 @@ canvas.addEventListener('pointerup', (ev) => {
 function setStage(n, keepCam) {
   S.stage = n; useDev(ST[n].def); Object.entries(ST).forEach(([id, st]) => (st.root.visible = Number(id) === n));
   S.pinned = null; $('card').style.display = 'none';
-  $('tab3').classList.toggle('on', n === 3); $('tab4').classList.toggle('on', n === 4); $('tab5').classList.toggle('on', n === 5);
+  $('tab3').classList.toggle('on', n === 3); $('tab4').classList.toggle('on', n === 4);
   $('intro').textContent = ST[n].def.intro;
   $('optSeeWrap').style.display = isDev(n) ? '' : 'none';
   $('btnFront').style.display = isDev(n) ? '' : 'none';
@@ -779,7 +778,7 @@ const ROAD = [
   { n: 1, t: 'Desk test (Pico)', ok: 'Sound through your earbuds, the buttons, and the song converter.', no: 'Does NOT prove battery life. The Pico uses about 1000x more power.', st: 'ready to buy parts' },
   { n: 2, t: 'Cell test', ok: 'Which solar cell gives how many microwatts (see CELL-TEST.md).', no: '', st: 'ready to buy parts' },
   { n: 3, t: 'Chip power test', ok: 'A low-power dev board plays one real song. We measure the real milliwatts.', no: '', st: 'not built yet' },
-  { n: 4, t: 'Final mini', ok: 'Puts it all together.', no: '', st: 'not built yet' },
+  { n: 4, t: 'Final device', ok: 'Puts it all together.', no: '', st: 'not built yet' },
 ];
 function updateRoad() {
   $('road').style.display = S.road ? 'block' : 'none'; $('btnRoad').classList.toggle('on', S.road);
@@ -812,7 +811,6 @@ function readHash() {
 }
 $('tab3').onclick = () => { S.panel = false; setStage(3); writeHash(); };
 $('tab4').onclick = () => { S.panel = false; setStage(4); writeHash(); };
-$('tab5').onclick = () => { S.panel = false; setStage(5); writeHash(); };
 $('vNormal').onclick = () => { setView('normal'); resetCamera(); writeHash(); };
 $('vExploded').onclick = () => { setView('exploded'); resetCamera(); writeHash(); };
 $('btnReset').onclick = resetCamera;
