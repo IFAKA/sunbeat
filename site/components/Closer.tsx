@@ -4,7 +4,7 @@ import Stage3D, { type Pose, type Stage3DHandle } from "./Stage3D";
 import { Panel, Tabs, Text, Slider, Kicker } from "./ui";
 const CHIPS: [string, string, Pose][] = [
   ["Closed", "The clip as you wear it.", { t: 0, focus: null, yaw: 25, pitch: 12 }],
-  ["Exploded", "Every part, apart. Light travels in orange, songs and sound in cyan.", { t: 1, focus: null, yaw: 210, pitch: 18 }],
+  ["Exploded", "Every part, apart.", { t: 1, focus: null, yaw: 210, pitch: 18 }],
   ["Light", "The front is the solar cell. It turns room light into power.", { t: 0.35, focus: "solar", yaw: 20, pitch: 10 }],
   ["Store", "Two coin cells keep the power. The harvester chip moves it in.", { t: 0.5, focus: ["battery", "battery2", "aem", "l-boost", "l-buck"], yaw: 195, pitch: 14 }],
   ["Songs", "An Artemis chip plays songs kept in 128 MB of memory.", { t: 0.5, focus: ["artemis", "flash"], yaw: 150, pitch: 26 }],

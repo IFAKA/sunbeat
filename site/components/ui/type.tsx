@@ -1,6 +1,6 @@
 import type { ElementType, ReactNode } from "react";
 
-export type Tone = "default" | "sun" | "ice" | "mute" | "soft";
+export type Tone = "default" | "sun" | "mute" | "soft";
 export type Gap = 0 | 1 | 2 | 3 | 4 | 5;
 const cx = (...a: (string | false | undefined)[]) => a.filter(Boolean).join(" ");
 const toneClass = (t: Tone) => (t === "default" ? "" : `ui-t--${t}`);
@@ -9,11 +9,11 @@ export { cx, mt, toneClass };
 
 /** Headings. level: display (hero), statement (big reading lines), title (section), beat (film), doc (page title), sub (card title). */
 export function Heading({ level = "title", as, tone = "default", glow, rule, mt: gap, className, children }: {
-  level?: "display" | "statement" | "title" | "beat" | "doc" | "sub"; as?: ElementType; tone?: "default" | "sun" | "ice";
-  glow?: "sun" | "ice"; rule?: boolean; mt?: Gap; className?: string; children: ReactNode;
+  level?: "display" | "statement" | "title" | "beat" | "doc" | "sub"; as?: ElementType; tone?: "default" | "sun" | "mute";
+  glow?: "sun"; rule?: boolean; mt?: Gap; className?: string; children: ReactNode;
 }) {
   const Tag = as ?? (level === "display" || level === "doc" ? "h1" : level === "sub" ? "h3" : "h2");
-  return <Tag className={cx("ui-h", `ui-h--${level}`, tone !== "default" && `ui-h--tone-${tone}`, glow && `ui-glow-${glow}`, (rule ?? level === "title") && "ui-rule", mt(gap), className)}>{children}</Tag>;
+  return <Tag className={cx("ui-h", `ui-h--${level}`, tone !== "default" && `ui-h--tone-${tone}`, glow && "ui-glow-sun", (rule ?? level === "title") && "ui-rule", mt(gap), className)}>{children}</Tag>;
 }
 
 /** Small label above a heading. Inter semibold, normal case. */
@@ -29,6 +29,6 @@ export function Text({ size = "body", tone = "default", strong, measure, mt: gap
 }
 
 /** Inline coloured (and glowing) words inside a heading or text. */
-export function Accent({ tone = "sun", glow, children }: { tone?: "sun" | "ice"; glow?: boolean; children: ReactNode }) {
-  return <span className={cx(`ui-t--${tone}`, glow && `ui-glow-${tone}`)}>{children}</span>;
+export function Accent({ tone = "sun", glow, children }: { tone?: "sun"; glow?: boolean; children: ReactNode }) {
+  return <span className={cx(`ui-t--${tone}`, glow && "ui-glow-sun")}>{children}</span>;
 }

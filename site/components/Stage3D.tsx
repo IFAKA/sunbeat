@@ -12,7 +12,7 @@ export type Stage3DHandle = { send: (p: Pose) => void };
  * The real 3D device in an iframe. It loads only when near the screen, and is removed when far away,
  * so only one or two WebGL pages live at once. Until the viewer says "ready" we show a dark poster.
  */
-const Stage3D = forwardRef<Stage3DHandle, { drag?: boolean; keepSpin?: boolean; marks?: string[]; onMarks?: (m: Record<string, number[]>) => void; ret?: number; initial?: Pose; className?: string; title?: string }>(function Stage3D({ drag = true, keepSpin, marks, onMarks, ret = 0, initial, className = "", title = "Sunbeat 3D model" }, ref) {
+const Stage3D = forwardRef<Stage3DHandle, { drag?: boolean; keepSpin?: boolean; ret?: number; initial?: Pose; className?: string; title?: string }>(function Stage3D({ drag = true, keepSpin, ret = 0, initial, className = "", title = "Sunbeat 3D model" }, ref) {
   const box = useRef<HTMLDivElement>(null);
   const frame = useRef<HTMLIFrameElement>(null);
   const ready = useRef(false);
@@ -40,15 +40,14 @@ const Stage3D = forwardRef<Stage3DHandle, { drag?: boolean; keepSpin?: boolean; 
     if (!near) { ready.current = false; setOk(false); return; }
     const on = (e: MessageEvent) => {
       if (e.source !== frame.current?.contentWindow || !e.data?.sunbeat) return;
-      if (e.data.marks) { onMarks?.(e.data.marks); return; }
       if (!e.data.ready) return;
       ready.current = true; post(); setOk(true);
     };
     window.addEventListener("message", on);
     return () => window.removeEventListener("message", on);
-  }, [near, post, onMarks]);
+  }, [near, post]);
 
-  const src = `/viewer/index.html?embed=1${drag ? "&drag=1" : ""}${keepSpin ? "&keepspin=1" : ""}${ret ? `&ret=${ret}` : ""}${marks ? `&marks=${marks.join(",")}` : ""}#stage=4`;
+  const src = `/viewer/index.html?embed=1${drag ? "&drag=1" : ""}${keepSpin ? "&keepspin=1" : ""}${ret ? `&ret=${ret}` : ""}#stage=4`;
   return (
     <div ref={box} className={className}>
       <StagePoster hide={ok} />

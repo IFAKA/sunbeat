@@ -3,7 +3,7 @@
 /* ============================================================================================
    Design tokens. The only place where colours, type sizes, spacing and radii are defined.
    One font: Inter (SIL Open Font License), loaded by next/font in app/layout.tsx.
-   Orange (sun) = energy. Cyan (ice) = data (songs, sound). Components that use these live in components/ui.
+   ONE colour: orange (sun). No second hue. Neutral greys for the rest. Components that use these live in components/ui.
    ============================================================================================ */
 @theme inline {
   --font-sans: var(--font-inter), system-ui, sans-serif;
@@ -18,7 +18,6 @@
   --color-line: #2c2c2e;
   --color-sun: #ffb340;
   --color-sun-deep: #ff8a00;
-  --color-ice: #5ce1ff;
 
   /* type scale (size, then its line height and tracking) */
   --text-display: clamp(34px, min(10vw, 10.5vh), 104px);
@@ -98,10 +97,10 @@ html.lenis, html.lenis body { height: auto; }
   @media (min-width: 48rem) { .ui-h--beat { font-size: clamp(36px, 4.4vw, 62px); } }
   .ui-h--doc { font-size: var(--text-doc); line-height: var(--text-doc--line-height); letter-spacing: var(--text-doc--letter-spacing); }
   .ui-h--sub { font-size: var(--text-sub); line-height: var(--text-sub--line-height); letter-spacing: var(--text-sub--letter-spacing); }
-  .ui-h--tone-sun, .ui-t--sun { color: var(--color-sun); }
-  .ui-h--tone-ice, .ui-t--ice { color: var(--color-ice); }
+  .ui-h--tone-sun { color: var(--color-sun); }
+  .ui-h--tone-mute { color: var(--color-mute); }
+  .ui-t--sun { color: var(--color-sun); }
   .ui-glow-sun { text-shadow: 0 0 28px color-mix(in srgb, var(--color-sun-deep) 42%, transparent); }
-  .ui-glow-ice { text-shadow: 0 0 28px color-mix(in srgb, var(--color-ice) 35%, transparent); }
   /* a thin glowing line under a heading */
   .ui-rule::after { content: ""; display: block; width: 72px; height: 1px; margin: 20px auto 0; background: linear-gradient(90deg, transparent, var(--color-sun), transparent); box-shadow: 0 0 14px 1px color-mix(in srgb, var(--color-sun-deep) 80%, transparent); }
 
@@ -144,7 +143,7 @@ html.lenis, html.lenis body { height: auto; }
 
   /* ---- Panel: 1px neon edge with corner brackets ---- */
   .ui-panel { --c: color-mix(in srgb, var(--color-sun) 95%, transparent); --edge: color-mix(in srgb, var(--color-sun) 22%, transparent); --wash: color-mix(in srgb, var(--color-sun-deep) 5%, transparent); position: relative; border: 1px solid var(--edge); border-radius: var(--radius-panel); background: linear-gradient(180deg, var(--wash), color-mix(in srgb, white 1.2%, transparent)); box-shadow: inset 0 0 40px color-mix(in srgb, var(--wash) 60%, transparent); }
-  .ui-panel--ice { --c: color-mix(in srgb, var(--color-ice) 95%, transparent); --edge: color-mix(in srgb, var(--color-ice) 22%, transparent); --wash: color-mix(in srgb, var(--color-ice) 5%, transparent); }
+  .ui-panel--mute { --c: color-mix(in srgb, var(--color-paper) 55%, transparent); --edge: color-mix(in srgb, var(--color-paper) 16%, transparent); --wash: color-mix(in srgb, var(--color-paper) 3%, transparent); }
   .ui-panel--black { background-color: var(--color-ink); }
   .ui-panel--pad { padding: 20px; } .ui-panel--padlg { padding: 24px; } .ui-panel--padx { padding-inline: 20px; }
   .ui-panel--fill { height: 100%; }
@@ -193,20 +192,12 @@ html.lenis, html.lenis body { height: auto; }
   .ui-footer { border-top: 1px solid var(--color-line); font-size: 12px; line-height: 1.6; color: var(--color-mute); }
 
   /* ---- 3D stage and film dots ---- */
-  .ui-stage-frame { @apply absolute inset-0 size-full border-0 transition-opacity duration-700; color-scheme: dark; --fade: linear-gradient(to right, transparent, #000 15%, #000 85%, transparent), linear-gradient(to bottom, transparent, #000 5%, #000 95%, transparent); -webkit-mask-image: var(--fade); mask-image: var(--fade); -webkit-mask-composite: source-in; mask-composite: intersect; }
+  /* Stage fade: all four edges melt into the black page, so the 3D stage never looks like a box. */
+  .ui-stage-frame { @apply absolute inset-0 size-full border-0 transition-opacity duration-700; color-scheme: dark; --fade: linear-gradient(to right, transparent, #000 22%, #000 78%, transparent), linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent); -webkit-mask-image: var(--fade); mask-image: var(--fade); -webkit-mask-composite: source-in; mask-composite: intersect; }
   .ui-orb { @apply size-24 rounded-full; background: radial-gradient(closest-side, color-mix(in srgb, var(--color-sun-deep) 35%, transparent), transparent); animation: breathe 5s ease-in-out infinite; }
   .ui-dots { @apply absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5; }
   .ui-dots i { @apply block h-1 w-1.5 rounded-full transition-all duration-300; background: color-mix(in srgb, var(--color-paper) 30%, transparent); }
   .ui-dots i.on { @apply w-6; background: var(--color-sun); box-shadow: 0 0 8px var(--color-sun); }
-
-  /* ---- Callout: a dot on the part, a thin line, a label. Placed by script (translate + --dy/--len/--ang). ---- */
-  .ui-callout { position: absolute; left: 0; top: 0; width: 0; height: 0; transition: opacity .3s; will-change: transform; --k: var(--color-sun); }
-  .ui-callout--ice { --k: var(--color-ice); }
-  .ui-callout i { position: absolute; left: -3px; top: -3px; width: 6px; height: 6px; border-radius: 50%; background: var(--k); box-shadow: 0 0 10px var(--k); }
-  .ui-callout b { position: absolute; top: 0; height: 1px; width: var(--len, 44px); background: var(--k); opacity: .7; }
-  .ui-callout span { position: absolute; top: calc(var(--dy, 0px) - 9px); white-space: nowrap; color: var(--k); font-size: var(--text-label); font-weight: 500; text-shadow: 0 0 10px var(--k); }
-  .ui-callout[data-side="r"] b { left: 0; transform-origin: 0 0; transform: rotate(var(--ang, 0deg)); } .ui-callout[data-side="r"] span { left: calc(var(--run, 44px) + 8px); }
-  .ui-callout[data-side="l"] b { right: 0; transform-origin: 100% 0; transform: rotate(calc(var(--ang, 0deg) * -1)); } .ui-callout[data-side="l"] span { right: calc(var(--run, 44px) + 8px); }
 
   /* ---- Prose (markdown docs) ---- */
   .ui-prose { font-size: var(--text-body); line-height: 1.6; color: color-mix(in srgb, var(--color-paper) 90%, transparent); }
@@ -226,9 +217,8 @@ html.lenis, html.lenis body { height: auto; }
   .ui-prose th { border-bottom: 1px solid var(--color-line); background: var(--color-card); padding: 8px 12px; font-weight: 600; }
   .ui-prose td { border-bottom: 1px solid var(--color-line); padding: 8px 12px; vertical-align: top; }
 
-  /* ---- Faint perspective grid floor, fading to a sun-lit horizon ---- */
+  /* ---- Faint perspective grid floor, fading out, neutral ---- */
   .ui-grid-floor::before { content: ""; position: absolute; left: -50%; right: -50%; bottom: 0; height: 60%; transform-origin: 50% 100%; transform: perspective(520px) rotateX(64deg);
-    background-image: linear-gradient(color-mix(in srgb, var(--color-ice) 28%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--color-ice) 28%, transparent) 1px, transparent 1px); background-size: 64px 64px;
+    background-image: linear-gradient(color-mix(in srgb, var(--color-paper) 9%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--color-paper) 9%, transparent) 1px, transparent 1px); background-size: 64px 64px;
     -webkit-mask-image: linear-gradient(to top, #000 0%, transparent 75%); mask-image: linear-gradient(to top, #000 0%, transparent 75%); opacity: 0.55; }
-  .ui-grid-floor::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 45%; background: radial-gradient(60% 100% at 50% 100%, color-mix(in srgb, var(--color-sun-deep) 22%, transparent), transparent 70%); }
 }

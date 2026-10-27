@@ -1,19 +1,19 @@
-import type { ElementType, ReactNode, Ref } from "react";
+import type { ElementType, ReactNode } from "react";
 import { cx, mt, Text, Heading, type Gap, type Tone } from "./type";
 
-/** The neon-bracket card. tone: sun (default) or ice. pad adds inner space. */
+/** The neon-bracket card. tone: sun (default) or mute (neutral). pad adds inner space. */
 export function Panel({ tone = "sun", pad, black, fill, href, as: Tag = "div", mt: gap, className, children }: {
-  tone?: "sun" | "ice"; pad?: "md" | "lg" | "x"; black?: boolean; fill?: boolean; href?: string; as?: ElementType; mt?: Gap; className?: string; children: ReactNode;
+  tone?: "sun" | "mute"; pad?: "md" | "lg" | "x"; black?: boolean; fill?: boolean; href?: string; as?: ElementType; mt?: Gap; className?: string; children: ReactNode;
 }) {
-  const c = cx("ui-panel", tone === "ice" && "ui-panel--ice", pad && `ui-panel--pad${pad === "md" ? "" : pad}`, black && "ui-panel--black", fill && "ui-panel--fill", href && "ui-panel--link", mt(gap), className);
+  const c = cx("ui-panel", tone === "mute" && "ui-panel--mute", pad && `ui-panel--pad${pad === "md" ? "" : pad}`, black && "ui-panel--black", fill && "ui-panel--fill", href && "ui-panel--link", mt(gap), className);
   return href ? <a href={href} className={c}>{children}</a> : <Tag className={c}>{children}</Tag>;
 }
 
 /** A big number with a label and a note. */
-export function Stat({ value, label, note, tone = "sun" }: { value: string; label: string; note: string; tone?: "sun" | "ice" }) {
+export function Stat({ value, label, note, }: { value: string; label: string; note: string }) {
   return (
-    <Panel tone={tone} pad="md" fill className="ui-stat">
-      <p className={cx("ui-stat__value", `ui-t--${tone}`, `ui-glow-${tone}`)}>{value}</p>
+    <Panel pad="md" fill className="ui-stat">
+      <p className={cx("ui-stat__value", "ui-t--sun", "ui-glow-sun")}>{value}</p>
       <Text size="body" strong mt={1}>{label}</Text>
       <Text size="fine" tone="mute" mt={1}>{note}</Text>
     </Panel>
@@ -32,7 +32,7 @@ export function DefList({ rows, variant = "spec", mt: gap }: { rows: readonly (r
 
 /** Two cards side by side, for the comparison. */
 export function CompareGrid({ mt: gap, children }: { mt?: Gap; children: ReactNode }) { return <div className={cx("ui-compare", mt(gap))}>{children}</div>; }
-export function CompareCard({ title, tone, rows }: { title: string; tone: "sun" | "ice"; rows: readonly (readonly [string, string])[] }) {
+export function CompareCard({ title, tone, rows }: { title: string; tone: "sun" | "mute"; rows: readonly (readonly [string, string])[] }) {
   return (
     <Panel tone={tone} pad="lg" fill>
       <Heading level="sub" as="h3" tone={tone} className="ui-kicker">{title}</Heading>
@@ -52,11 +52,6 @@ export function Disclosure({ summary, open, onToggle, children }: { summary: str
 }
 export function DisclosureList({ children }: { children: ReactNode }) { return <Panel pad="x" className="ui-rows">{children}</Panel>; }
 export function Toolbar({ children }: { children: ReactNode }) { return <div className="ui-toolbar">{children}</div>; }
-
-/** Dot, thin line and label that point at a part. Placed by script through its ref. */
-export function CalloutLabel({ tone = "sun", label, refCb }: { tone?: "sun" | "ice"; label: string; refCb: Ref<HTMLDivElement> }) {
-  return <div ref={refCb} style={{ opacity: 0 }} className={cx("ui-callout", tone === "ice" && "ui-callout--ice")}><i /><b /><span>{label}</span></div>;
-}
 
 /** Progress dots of the film. Mark the active one with the "on" class from script. */
 export function Dots({ count, refCb }: { count: number; refCb: (i: number, el: HTMLElement | null) => void }) {

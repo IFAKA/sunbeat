@@ -11,9 +11,9 @@ import { Section, Heading, Kicker, Text, Button, Link, Stat, StatGrid, DefList, 
 
 const NUMBERS = [
   ["149 µW", "from room light", "Two solar cells at 200 lux. Datasheet: 74 µW each.", "sun"],
-  ["3 h", "of songs a day", "Kept up for ever on 8 hours of room light. Estimate.", "ice"],
+  ["3 h", "of songs a day", "Kept up for ever on 8 hours of room light. Estimate.", "sun"],
   ["490 h", "with no light", "A full coin cell, songs only. Best case. Estimate.", "sun"],
-  ["150", "songs on board", "128 MB, 8 kHz, about 9 hours.", "ice"],
+  ["150", "songs on board", "128 MB, 8 kHz, about 9 hours.", "sun"],
 ] as const;
 
 // Honest, hedged: the right column is a typical rechargeable player, not a named product, so no invented numbers.
@@ -64,8 +64,8 @@ export default function Home() {
           <Reveal><Kicker>The numbers</Kicker></Reveal>
           <Reveal delay={0.05}><Heading mt={1}>Honest about every one.</Heading></Reveal>
           <StatGrid mt={5}>
-            {NUMBERS.map(([n, u, d, tone], i) => (
-              <Reveal key={n} delay={i * 0.07} className="h-full"><Stat value={n} label={u} note={d} tone={tone} /></Reveal>
+            {NUMBERS.map(([n, u, d], i) => (
+              <Reveal key={n} delay={i * 0.07} className="h-full"><Stat value={n} label={u} note={d} /></Reveal>
             ))}
           </StatGrid>
           <Text size="small" tone="mute" measure mt={4}>Nothing here is measured on the finished clip, because it is not built. Step 3 of the plan measures the real chip power.</Text>
@@ -85,7 +85,7 @@ export default function Home() {
           <Reveal delay={0.05}><Heading mt={1}>Not a better player.<br />A player you stop thinking about.</Heading></Reveal>
           <CompareGrid mt={5}>
             <Reveal delay={0.05} className="h-full"><CompareCard title="Sunbeat" tone="sun" rows={COMPARE.map((r) => [r[0], r[1]] as const)} /></Reveal>
-            <Reveal delay={0.12} className="h-full"><CompareCard title="A typical rechargeable player" tone="ice" rows={COMPARE.map((r) => [r[0], r[2]] as const)} /></Reveal>
+            <Reveal delay={0.12} className="h-full"><CompareCard title="A typical rechargeable player" tone="mute" rows={COMPARE.map((r) => [r[0], r[2]] as const)} /></Reveal>
           </CompareGrid>
           <Text size="small" tone="mute" measure mt={4}>The right column is a general picture of rechargeable players, not one product. Sunbeat numbers are estimates until the clip is built and measured.</Text>
         </Section>
