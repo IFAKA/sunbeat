@@ -152,10 +152,25 @@ export const stage3 = {
     },
     {
       id: 'wire-gnd', group: 2, name: 'Wire 4: Pico GND to jack ground', short: 'Wire 4',
-      role: 'Ground wire. Pico pin 18 (GND) goes to RING 2 of the jack. The last pin (S) is the earbud button line: wire it to Pico GP26 (pin 31) and add a 2.2k resistor from GP22 (pin 29) to GP26 (not drawn yet).',
+      role: 'Ground wire. Pico pin 18 (GND) goes to RING 2 of the jack. The last pin (S) is the earbud button line (see Wire 5).',
       size: [10 * P, 18, 0], dimText: 'about 150 mm male-male jumper wire', dimOrder: 'xzy', pos: [0, 0, 0], explode: [0, 20, 0],
       build: { kind: 'jumper', from: hole(17, 'j'), to: hole(JACK_COL0 + 2, 'c'), arc: 20, color: '#222222', y0: BB.top },
-      source: 'estimate (standard male-male jumper wires). Most earbuds use RING 2 as ground; if you hear nothing, swap the wire to pin S.',
+      source: 'estimate (standard male-male jumper wires). Most earbuds use RING 2 as ground; if the button does nothing, swap the wires on RING 2 and S.',
+    },
+    {
+      id: 'resistor-bias', group: 1, name: 'Resistor 2.2 kOhm', short: '2.2k resistor',
+      role: 'Lets the Pico read your earbud button. GP22 (pin 29) feeds it for a moment, GP26 (pin 31) reads the line.',
+      size: [6.3, 2.4, 2.4], dimText: 'body 6.3 mm long x 2.4 mm wide, legs 5 mm apart', dimOrder: 'xzy',
+      pos: [0, 0, 0], explode: [0, 24, 0],
+      build: { kind: 'resistor', a: hole(11, 'b'), b: hole(9, 'b'), bodyL: 6.3, bodyD: 2.4, y0: BB.top, lift: 1.5 },
+      source: 'estimate (standard 1/4 W axial resistor). Bands: red, red, red = 2.2k.',
+    },
+    {
+      id: 'wire-mic', group: 2, name: 'Wire 5: earbud button line', short: 'Wire 5',
+      role: 'Takes the earbud button line (jack pole S) to the Pico GP26 pin (pin 31), where the resistor meets it.',
+      size: [19 * P, 12, 0], dimText: 'about 150 mm male-male jumper wire', dimOrder: 'xzy', pos: [0, 0, 0], explode: [0, 20, 0],
+      build: { kind: 'jumper', from: hole(9, 'a'), to: hole(JACK_COL0 + 3, 'c'), arc: 14, color: '#2ecc71', y0: BB.top },
+      source: 'estimate (standard male-male jumper wires).',
     },
     {
       id: 'earbud-plug', group: 2, name: 'Your earbud plug (3.5 mm, 4 poles)', short: 'Earbud plug',
