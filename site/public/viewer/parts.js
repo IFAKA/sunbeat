@@ -152,7 +152,7 @@ export const stage3 = {
     },
     {
       id: 'wire-gnd', group: 2, name: 'Wire 4: Pico GND to jack ground', short: 'Wire 4',
-      role: 'Ground wire. Pico pin 18 (GND) goes to RING 2 of the jack. The last pin (S) is the microphone and stays empty.',
+      role: 'Ground wire. Pico pin 18 (GND) goes to RING 2 of the jack. The last pin (S) is the earbud button line: wire it to Pico GP26 (pin 31) and add a 2.2k resistor from GP22 (pin 29) to GP26 (not drawn yet).',
       size: [10 * P, 18, 0], dimText: 'about 150 mm male-male jumper wire', dimOrder: 'xzy', pos: [0, 0, 0], explode: [0, 20, 0],
       build: { kind: 'jumper', from: hole(17, 'j'), to: hole(JACK_COL0 + 2, 'c'), arc: 20, color: '#222222', y0: BB.top },
       source: 'estimate (standard male-male jumper wires). Most earbuds use RING 2 as ground; if you hear nothing, swap the wire to pin S.',

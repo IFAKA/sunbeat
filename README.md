@@ -21,7 +21,7 @@ Sunbeat is an open **concept** for a tiny self-powered MP3 player. It started wi
 
 1. **Add songs.** USB-C to a laptop; an app shrinks them to 4-bit ADPCM at 8 kHz (about 14 MB per hour).
 2. **Clip it on.** Plug in any wired earbuds (3.5 mm).
-3. **Play.** One side button: 1 click play/pause, 2 next, 3 previous, hold = volume.
+3. **Play.** Use the button on your own earbud cable: 1 click play/pause, 2 next, 3 previous, hold = volume.
 4. **Forget it.** Room light fills the battery. In the dark it plays about 490 hours (best case). When the battery is low it falls back to a chiptune version of your songs.
 
 Sound comes from one pin (1-bit PWM) through a resistor and a capacitor. The earbud smooths the fast ON/OFF pulses into real sound, like SACD does.

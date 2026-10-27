@@ -1,6 +1,7 @@
 # Pico MicroPython player v1: plays every song in songs/ (made by build_songs.py) on GP15, through a >=4.7k series
 # resistor and a 1 uF capacitor to the earbud. Never connect GP15 straight to the earbud.
-# Button = BOOTSEL.  1 click = play/pause, 2 clicks = next, 3 clicks = previous, long press = volume (1/4, 1/2, full).
+# Button = the earbud button (jack pole S -> GP26, 2.2k from GP22 to GP26). BOOTSEL also works.
+# 1 click = play/pause, 2 clicks = next, 3 clicks = previous, long press = volume (1/4, 1/2, full).
 # Needs MicroPython built after 2025-03-13 (older RP2350 builds always read the button as pressed).
 # UNTESTED on a real Pico until you flash it. Copy player.py as main.py (or run it from Thonny) and the songs/ folder.
 import os
@@ -9,7 +10,7 @@ from array import array
 
 import micropython
 import rp2
-from machine import PWM, Pin, Timer
+from machine import ADC, PWM, Pin, Timer
 
 PIN = 15
 DIR = "songs"
@@ -136,13 +137,20 @@ def open_song(i):
     print("song", cur + 1, "/", len(songs), songs[cur], "rate", rate)
 
 
+bias = Pin(22, Pin.IN)  # 2.2k bias resistor: GP22 goes high only for a moment, to read the line
+mic = ADC(26)  # jack pole S (earbud button line)
+PRESSED = 9000  # 16-bit reading under ~0.45 V = button shorts the line to ground
 g = array("I", [0, 0, 0])  # button state: is down, press start time, clicks
 
 
 def poll():
     """Non-blocking button reader. Returns 0 (nothing yet), 1/2/3 (clicks) or -1 (long press)."""
     now = time.ticks_ms()
-    b = rp2.bootsel_button()
+    bias.init(Pin.OUT, value=1)
+    time.sleep_us(300)  # let the line settle
+    v = mic.read_u16()
+    bias.init(Pin.IN)  # off again, no current between reads
+    b = v < PRESSED or rp2.bootsel_button()
     if b and not g[0]:
         g[0] = 1
         g[1] = now
