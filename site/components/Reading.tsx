@@ -3,6 +3,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { useRef } from "react";
+import SolarGrid from "./SolarGrid";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -21,8 +22,9 @@ export default function Reading() {
   }, { scope: root });
   return (
     <section ref={root} id="never" className="relative h-[240svh]">
-      <div className="sticky top-0 mx-auto flex h-svh max-w-[1080px] flex-col items-center justify-center px-5 py-[56px] text-center">
-        <p className="mb-[2svh] text-[clamp(17px,2.6svh,22px)] font-semibold text-sun">Nothing to remember</p>
+      <div className="sticky top-0 h-svh"><SolarGrid className="!-z-0" /></div>
+      <div className="sticky top-0 mx-auto -mt-[100svh] flex h-svh max-w-[1080px] flex-col items-center justify-center px-5 py-[56px] text-center">
+        <p className="kicker mb-[2svh] text-sun">Nothing to remember</p>
         {["charger.", "cable.", "reminder."].map((w) => (
           <p key={w} className="pl text-[clamp(32px,min(11svh,11vw),104px)] font-semibold leading-[1.06] tracking-[-0.04em]">No {w}</p>
         ))}

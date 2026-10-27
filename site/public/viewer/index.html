@@ -104,7 +104,7 @@
   html.embed #side, html.embed #labels, html.embed #size4, html.embed #card, html.embed #scalehint, html.embed #panel, html.embed #road, html.embed #err { display:none !important; }
   html.embed #app { display:block; height:100%; }
   html.embed #main { height:100% !important; width:100%; }
-  html.embed #gl { pointer-events:none; }
+  html.embed #gl { pointer-events:none; touch-action:pan-y; }
   html.embed.drag #gl { pointer-events:auto; cursor:grab; }
   html.embed.drag #gl:active { cursor:grabbing; }
 </style>
@@ -619,13 +619,16 @@ const main = document.getElementById('main');
 const QS = new URLSearchParams(location.search);
 const EMBED = QS.get('embed') === '1', DRAG = EMBED && QS.get('drag') === '1';
 if (DRAG) document.documentElement.classList.add('drag');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: EMBED, preserveDrawingBuffer: !EMBED });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, EMBED ? 1.75 : 2));
-renderer.setClearColor(0x000000, EMBED ? 0 : 1);
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const SMALL = matchMedia('(pointer: coarse)').matches || Math.min(screen.width, screen.height) < 700;
+const PR = Math.min(window.devicePixelRatio || 1, SMALL ? 1.5 : 2);
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, preserveDrawingBuffer: !EMBED });
+renderer.setPixelRatio(EMBED ? PR : Math.min(window.devicePixelRatio || 1, 2));
+renderer.setClearColor(0x000000, 1);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 const scene = new THREE.Scene();
 if (!EMBED) scene.background = new THREE.Color('#000000');
-const camera = new THREE.PerspectiveCamera(38, 1, 1, 2000);
+const camera = new THREE.PerspectiveCamera(38, 1, 1, 6000);
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true; controls.dampingFactor = 0.12;
 if (EMBED) { controls.enabled = false; canvas.style.touchAction = DRAG ? 'pan-y' : 'none'; } // embed: own camera, no zoom, page scroll stays free
@@ -964,23 +967,121 @@ function pcbSvg() {
 
 
 // ------------------------------------------------------------------ embed mode (landing page)
-// The parent page sends {sunbeat:1, t, yaw, pitch, dist, zoom, focus, spin, paused}. We ease toward the latest values.
-// yaw 0 looks at the solar side, 180 at the back. t is the explode amount 0..1. dist is mm or 'fit'. focus is a part id or a list.
-const BASE_TARGET = new THREE.Vector3(0, 0, 5);
+// The parent page sends {sunbeat:1, t, yaw, pitch, dist, zoom, focus, spin, speed, snap, paused, ret}.
+// We ease toward the latest values. yaw 0 looks at the solar side, 180 at the back. t is the explode amount 0..1.
+// dist is mm or 'fit'. focus is a part id or a list. ret = seconds for the user's drag turn to ease back (0 = stays).
+// The user's drag turn (OFF) is ADDED to the yaw and pitch the parent sends.
 const E = {
   tgt: { t: 0, yaw: 25, pitch: 12, dist: 'fit', zoom: 1, spin: false },
   cur: { t: 0, yaw: 25, pitch: 12, dist: 120, zoom: 1 },
-  focus: null, look: BASE_TARGET.clone(), speed: 10, // speed: ease rate per second
+  focus: null, look: new THREE.Vector3(0, 0, 5), speed: 10, ret: 0, keepSpin: false,
 };
+const OFF = { yaw: 0, pitch: 0, vy: 0, vp: 0, down: false };
 let paused = false;
+const ORANGE = new Set(['solar', 'battery', 'battery2', 'aem', 'l-boost', 'l-buck', 'c-src', 'c-boost', 'c-buck', 'c-hv', 'c-lv']);
+const CYAN = new Set(['artemis', 'jack', 'flash', 'usbc', 'ch340', 'r-audio', 'c-audio', 'c-flash', 'c-usb', 'r-cfg', 'r-cc1', 'r-cc2']);
+const EDGE = { orange: new THREE.Color(0xffa030).multiplyScalar(1.7), cyan: new THREE.Color(0x35e6ff).multiplyScalar(1.5), shell: new THREE.Color(0xb7c4d6), pcb: new THREE.Color(0x4fa9c0).multiplyScalar(0.8), other: new THREE.Color(0x8ea0b8) };
+const FLOW = []; // moving light dashes: orange = energy, cyan = data
+let floor = null, composer = null, bloomOn = false, SPHERE = { c: new THREE.Vector3(0, 0, 5), r: 60 }, boxes = {};
+
+// Tron look: thin glowing edges on every part, a darker glassy fill.
+function styleParts() {
+  const st = ST[4]; if (!st) return;
+  Object.entries(st.parts).forEach(([id, pt]) => {
+    const kind = ORANGE.has(id) ? 'orange' : CYAN.has(id) ? 'cyan' : pt.def.caseShell || id === 'clip' ? 'shell' : id === 'pcb' ? 'pcb' : 'other';
+    const op = kind === 'shell' ? 0.55 : kind === 'pcb' ? 0.5 : 0.95;
+    pt.edgeMats = [];
+    const meshes = []; pt.body.traverse((o) => { if (o.isMesh) meshes.push(o); });
+    meshes.forEach((o) => {
+      const m = o.material;
+      if (!m.userData.dk) { m.userData.dk = 1; m.color.multiplyScalar(kind === 'shell' ? 0.8 : 0.52); if (m.roughness !== undefined) m.roughness = Math.min(1, m.roughness + 0.1); }
+      if (o.geometry.attributes.position.count > 600) return; // skip very round / dense shapes
+      const lm = new THREE.LineBasicMaterial({ color: EDGE[kind], transparent: true, opacity: op });
+      lm.userData.op = op; pt.edgeMats.push(lm);
+      const ln = new THREE.LineSegments(new THREE.EdgesGeometry(o.geometry, 28), lm);
+      ln.raycast = () => {}; o.add(ln);
+    });
+  });
+  // lights a little softer so the glow reads
+  scene.children.forEach((c) => { if (c.isLight) c.intensity *= 0.72; });
+}
+
+// A perspective grid floor that fades to a horizon with a dim sun glow.
+function makeFloor(y) {
+  const mat = new THREE.ShaderMaterial({
+    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+    uniforms: { uTime: { value: 0 }, uMotion: { value: RM ? 0 : 1 } },
+    vertexShader: 'varying vec3 vW; void main(){ vec4 w = modelMatrix*vec4(position,1.); vW = w.xyz; gl_Position = projectionMatrix*viewMatrix*w; }',
+    fragmentShader: `varying vec3 vW; uniform float uTime; uniform float uMotion;
+      float grid(vec2 p, float s){ vec2 q = p/s; vec2 g = abs(fract(q-0.5)-0.5)/max(fwidth(q),vec2(1e-4)); return 1.-min(min(g.x,g.y),1.); }
+      void main(){
+        vec2 p = vW.xz; float r = length(p);
+        float fine = grid(p, 12.), major = grid(p, 60.);
+        float fade = 1.-smoothstep(60., 1100., r);
+        vec3 cyan = vec3(0.12,0.75,1.0), orange = vec3(1.0,0.55,0.12);
+        vec3 col = cyan*(fine*0.07 + major*0.26)*fade;
+        col += orange*0.07*exp(-r*r/(2.*45.*45.));                    // warm pool under the device
+        float ring = fract(r/480. - uTime*0.05*uMotion);                // slow pulse travelling out
+        col += cyan*0.22*smoothstep(0.,0.008,ring)*(1.-smoothstep(0.008,0.025,ring))*fade*uMotion*step(60.,r);
+        col += orange*0.16*smoothstep(500.,1300.,r)*(1.-smoothstep(1300.,1480.,r)); // sun glow at the horizon
+        gl_FragColor = vec4(col, 1.);
+      }`,
+  });
+  floor = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), mat);
+  floor.rotation.x = -Math.PI / 2; floor.position.y = y; floor.renderOrder = -1; floor.raycast = () => {};
+  scene.add(floor);
+}
+
+// Energy (orange) and data (cyan) travelling between the real parts.
+const PATHS = [
+  { ids: ['solar', 'aem', 'battery', 'battery2', 'artemis'], color: 0xffa030, speed: 9 },
+  { ids: ['flash', 'artemis'], color: 0x35e6ff, speed: 9 },
+  { ids: ['artemis', 'jack'], color: 0x35e6ff, speed: 9 },
+];
+function makeFlow() {
+  PATHS.forEach((p) => {
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(p.ids.length * 3), 3));
+    const dm = new THREE.LineDashedMaterial({ color: new THREE.Color(p.color).multiplyScalar(1.8), dashSize: 2.2, gapSize: 4.2, transparent: true, opacity: 0, depthTest: false, depthWrite: false });
+    const bm = new THREE.LineBasicMaterial({ color: p.color, transparent: true, opacity: 0, depthTest: false, depthWrite: false });
+    const dash = new THREE.Line(g, dm), base = new THREE.Line(g, bm); dash.renderOrder = base.renderOrder = 20;
+    dash.frustumCulled = base.frustumCulled = false; dash.raycast = base.raycast = () => {};
+    base.visible = dash.visible = false; scene.add(base, dash); FLOW.push({ p, g, dm, bm, dash, base, vis: 0 });
+  });
+}
+const _b = new THREE.Box3(), _v = new THREE.Vector3();
+// Boxes and the bounding sphere of the whole (exploded) model. Recomputed when the explode amount changes.
+function measure() {
+  const st = ST[S.stage]; let all = null;
+  Object.entries(st.parts).forEach(([id, pt]) => { pt.node.updateMatrixWorld(true); const b = new THREE.Box3().setFromObject(pt.node); boxes[id] = b; all = all ? all.union(b) : b.clone(); });
+  const c = all.getCenter(new THREE.Vector3()); let r = 0;
+  Object.values(boxes).forEach((b) => { for (let i = 0; i < 8; i++) { _v.set(i & 1 ? b.max.x : b.min.x, i & 2 ? b.max.y : b.min.y, i & 4 ? b.max.z : b.min.z); r = Math.max(r, _v.distanceTo(c)); } });
+  SPHERE = { c, r, minY: all.min.y };
+  if (floor) floor.position.y = Math.min(all.min.y, -24) - 6;
+  FLOW.forEach((f) => {
+    const a = f.g.attributes.position;
+    f.p.ids.forEach((id, i) => { const b = boxes[id]; if (b) { b.getCenter(_v); a.setXYZ(i, _v.x, _v.y, _v.z); } });
+    a.needsUpdate = true; f.dash.computeLineDistances();
+  });
+}
+// Sphere (center, radius) the camera must keep in view: the whole model, or the focused parts.
+function viewSphere() {
+  if (!E.focus) return SPHERE;
+  let box = null; E.focus.forEach((id) => { if (boxes[id]) box = box ? box.union(boxes[id].clone()) : boxes[id].clone(); });
+  if (!box) return SPHERE;
+  const c = box.getCenter(new THREE.Vector3()); let r = 0;
+  E.focus.forEach((id) => { const b = boxes[id]; if (!b) return; for (let i = 0; i < 8; i++) { _v.set(i & 1 ? b.max.x : b.min.x, i & 2 ? b.max.y : b.min.y, i & 4 ? b.max.z : b.min.z); r = Math.max(r, _v.distanceTo(c)); } });
+  return { c, r: Math.max(r, 16) };
+}
+function fitDist(sph, zoom) {
+  const half = Math.min((camera.fov * Math.PI) / 360, Math.atan(Math.tan((camera.fov * Math.PI) / 360) * camera.aspect));
+  const R = sph.r + sph.c.distanceTo(E.look); // lag of the eased look point counts too
+  return (R * 1.07) / Math.sin(half) / Math.min(1, zoom);
+}
 function initEmbed() {
   S.names = false; S.grid = false;
   Object.values(ST).forEach((st) => (st.grid.visible = false));
   refreshLabels(); setView('normal', true);
-}
-function fitDist(t, zoom) {
-  const R = 36 + 22 * t; // radius that holds the device at any turn
-  return (R * 1.08) / (Math.tan((camera.fov * Math.PI) / 360) * Math.min(1, camera.aspect)) / zoom;
+  styleParts(); makeFlow(); makeFloor(-30); E.measured = -1; setupComposer();
 }
 function applyDim(pt) {
   const d = pt.dim;
@@ -992,34 +1093,74 @@ function applyDim(pt) {
     m.opacity = u.o0.op * (1 - 0.9 * d); m.depthWrite = d > 0.001 ? false : u.o0.dw;
     if (tr !== m.transparent) { m.transparent = tr; m.needsUpdate = true; } // the shader differs for opaque materials
   });
+  (pt.edgeMats || []).forEach((m) => { m.opacity = m.userData.op * (1 - 0.88 * d); });
 }
-function embedStep(dt) {
+let flowT = 0;
+function embedStep(dt, now) {
   const { tgt, cur } = E; const k = 1 - Math.exp(-dt * E.speed);
-  if (tgt.spin) tgt.yaw += dt * 14;
+  const dragging = OFF.down;
+  if (tgt.spin && !dragging) tgt.yaw += dt * 14;
   for (const key of ['t', 'yaw', 'pitch', 'zoom']) cur[key] += (tgt[key] - cur[key]) * k;
-  const want = tgt.dist === 'fit' ? fitDist(cur.t, cur.zoom) : Number(tgt.dist);
-  cur.dist += (want - cur.dist) * k;
+  // the user's turn: inertia after release, then (if asked) a slow ease back so the scroll film still reads
+  if (!dragging) {
+    OFF.yaw += OFF.vy * dt; OFF.pitch += OFF.vp * dt;
+    const damp = Math.exp(-dt * 3.2); OFF.vy *= damp; OFF.vp *= damp;
+    if (OFF.resetT > 0) OFF.resetT -= dt;
+    if (E.ret > 0 || OFF.resetT > 0) { const back = Math.exp(-dt * 3 / (OFF.resetT > 0 ? 0.5 : E.ret)); OFF.yaw *= back; OFF.pitch *= back; if (Math.abs(OFF.yaw) < 0.01) OFF.yaw = 0; if (Math.abs(OFF.pitch) < 0.01) OFF.pitch = 0; }
+    if (Math.abs(OFF.vy) < 0.05) OFF.vy = 0; if (Math.abs(OFF.vp) < 0.05) OFF.vp = 0;
+  }
   if (Math.abs(S.t - cur.t) > 0.0005) { S.t = cur.t; applyExplode(); }
+  if (E.measured !== S.t) { measure(); E.measured = S.t; }
   // focus: dim the other parts and look at the focused ones
-  let box = null;
   Object.entries(ST[S.stage].parts).forEach(([id, pt]) => {
     const goal = E.focus && !E.focus.has(id) ? 1 : 0, d = pt.dim || 0;
     if (d !== goal) { pt.dim = E.snap || Math.abs(goal - d) < 0.002 ? goal : d + (goal - d) * k; applyDim(pt); }
-    if (E.focus && E.focus.has(id)) { const b = new THREE.Box3().setFromObject(pt.node); box = box ? box.union(b) : b; }
   });
-  E.look.lerp(box ? box.getCenter(new THREE.Vector3()) : BASE_TARGET, E.snap ? 1 : k); E.snap = false;
-  const y = (cur.yaw * Math.PI) / 180, p = (cur.pitch * Math.PI) / 180, c = Math.cos(p);
+  const sph = viewSphere();
+  E.look.lerp(sph.c, E.snap ? 1 : k);
+  const want = tgt.dist === 'fit' ? fitDist(sph, cur.zoom) : Number(tgt.dist);
+  cur.dist += (want - cur.dist) * k;
+  if (tgt.dist === 'fit' && (cur.dist < want || E.snap)) cur.dist = want; // zoom out at once, zoom in smoothly: never cropped
+  E.snap = false;
+  const yaw = cur.yaw + OFF.yaw, pitch = Math.max(-85, Math.min(85, cur.pitch + OFF.pitch));
+  if (OFF.pitch + cur.pitch > 85 || OFF.pitch + cur.pitch < -85) OFF.pitch = Math.max(-85, Math.min(85, OFF.pitch + cur.pitch)) - cur.pitch;
+  const y = (yaw * Math.PI) / 180, p = (pitch * Math.PI) / 180, c = Math.cos(p);
   camera.position.set(E.look.x + cur.dist * c * Math.sin(y), E.look.y + cur.dist * Math.sin(p), E.look.z + cur.dist * c * Math.cos(y));
   camera.lookAt(E.look);
+  // light flowing along the paths
+  flowT += RM ? 0 : dt;
+  FLOW.forEach((f) => {
+    const want = E.focus ? (f.p.ids.some((id) => E.focus.has(id)) ? 1 : 0) : Math.max(0, Math.min(1, (cur.t - 0.2) * 3));
+    f.vis += (want - f.vis) * k;
+    f.dm.opacity = f.vis * 0.95; f.bm.opacity = f.vis * 0.22; f.dash.visible = f.base.visible = f.vis > 0.01;
+    if (!RM) f.dm.dashOffset = -flowT * f.p.speed;
+  });
+  if (floor) floor.material.uniforms.uTime.value = flowT;
+  if (MARKS.length) sendMarks();
+}
+// Test hook: the largest |x| and |y| (screen units, 1 = edge) of any part corner. Under 1 means nothing is cropped.
+window.__ndc = () => { camera.updateMatrixWorld(); let mx = 0, my = 0; Object.values(boxes).forEach((b) => { for (let i = 0; i < 8; i++) { _mk.set(i & 1 ? b.max.x : b.min.x, i & 2 ? b.max.y : b.min.y, i & 4 ? b.max.z : b.min.z).project(camera); mx = Math.max(mx, Math.abs(_mk.x)); my = Math.max(my, Math.abs(_mk.y)); } }); return [mx, my]; };
+// Screen positions of named parts, so the page can draw labelled leader lines (hero callouts).
+const MARKS = (QS.get('marks') || '').split(',').filter(Boolean), _mk = new THREE.Vector3(); let lastMarks = '';
+function sendMarks() {
+  if (parent === window) return;
+  camera.updateMatrixWorld();
+  const out = {};
+  MARKS.forEach((id) => { const b = boxes[id]; if (!b) return; b.getCenter(_mk).project(camera); out[id] = [Math.round(((_mk.x + 1) / 2) * 1000) / 1000, Math.round(((1 - _mk.y) / 2) * 1000) / 1000, _mk.z < 1 ? 1 : 0]; });
+  const j = JSON.stringify(out); if (j === lastMarks) return; lastMarks = j;
+  parent.postMessage({ sunbeat: 1, marks: out }, '*');
 }
 function applyMessage(m) {
   const { tgt } = E;
-  for (const key of ['yaw', 'pitch', 'zoom']) if (typeof m[key] === 'number') tgt[key] = m[key];
+  for (const key of ['yaw', 'pitch']) if (typeof m[key] === 'number') tgt[key] = m[key];
+  if (typeof m.zoom === 'number') tgt.zoom = Math.max(0.5, Math.min(1, m.zoom)); // never closer than "whole model fits"
   if (typeof m.t === 'number') tgt.t = Math.max(0, Math.min(1, m.t));
   if (m.dist !== undefined) tgt.dist = m.dist;
-  if (m.spin !== undefined) tgt.spin = !!m.spin;
+  if (m.spin !== undefined) tgt.spin = !!m.spin && !RM;
   if (m.focus !== undefined) E.focus = m.focus ? new Set([].concat(m.focus)) : null;
   if (m.speed) E.speed = m.speed;
+  if (typeof m.ret === 'number') E.ret = m.ret;
+  if (m.reset) { OFF.vy = OFF.vp = 0; OFF.yaw = ((OFF.yaw + 540) % 360) - 180; OFF.resetT = 1.5; }
   if (m.snap) E.snap = true;
   if (m.snap) Object.assign(E.cur, { t: tgt.t, yaw: tgt.yaw, pitch: tgt.pitch, zoom: tgt.zoom });
   if (m.paused !== undefined) paused = !!m.paused;
@@ -1027,36 +1168,69 @@ function applyMessage(m) {
 if (EMBED) {
   // start pose from the query string, e.g. ?embed=1&yaw=200&t=1&focus=battery,battery2 (also handy for tests)
   const num = (k) => (QS.has(k) ? Number(QS.get(k)) : undefined);
+  E.keepSpin = QS.get('keepspin') === '1'; E.ret = num('ret') || 0;
   applyMessage({ t: num('t'), yaw: num('yaw'), pitch: num('pitch'), zoom: num('zoom'), spin: QS.get('spin') === '1', focus: QS.get('focus') ? QS.get('focus').split(',') : undefined, snap: true });
   window.addEventListener('message', (e) => { if (e.source === parent && e.data && e.data.sunbeat) applyMessage(e.data); });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) { last = lastEmbed = performance.now(); } });
   if (DRAG) {
-    let drag = null;
-    canvas.addEventListener('pointerdown', (ev) => { drag = { x: ev.clientX, y: ev.clientY }; canvas.setPointerCapture(ev.pointerId); E.tgt.spin = false; });
+    let drag = null, lt = 0;
+    canvas.addEventListener('pointerdown', (ev) => {
+      drag = { x: ev.clientX, y: ev.clientY }; lt = ev.timeStamp; canvas.setPointerCapture(ev.pointerId);
+      OFF.down = true; OFF.vy = OFF.vp = 0; if (!E.keepSpin) E.tgt.spin = false;
+    });
     canvas.addEventListener('pointermove', (ev) => {
       if (!drag) return;
-      E.tgt.yaw -= (ev.clientX - drag.x) * 0.45; E.tgt.pitch = Math.max(-80, Math.min(80, E.tgt.pitch + (ev.clientY - drag.y) * 0.3));
-      drag = { x: ev.clientX, y: ev.clientY };
+      const dx = ev.clientX - drag.x, dy = ev.clientY - drag.y, dts = Math.max(0.008, (ev.timeStamp - lt) / 1000);
+      // drag right turns the device to the right, drag down tips the top toward you
+      OFF.yaw -= dx * 0.45; OFF.pitch += dy * 0.35;
+      OFF.vy = OFF.vy * 0.6 + (-dx * 0.45 / dts) * 0.4; OFF.vp = OFF.vp * 0.6 + (dy * 0.35 / dts) * 0.4;
+      OFF.vy = Math.max(-500, Math.min(500, OFF.vy)); OFF.vp = Math.max(-300, Math.min(300, OFF.vp));
+      drag = { x: ev.clientX, y: ev.clientY }; lt = ev.timeStamp;
     });
-    const end = () => { drag = null; };
+    const end = () => {
+      if (!drag) return; drag = null; OFF.down = false;
+      if (E.ret > 0) { OFF.yaw = ((OFF.yaw + 540) % 360) - 180; } // return the short way round
+    };
     canvas.addEventListener('pointerup', end); canvas.addEventListener('pointercancel', end);
   }
+}
+
+// Bloom: loaded on the side. If anything fails we render without it.
+async function setupComposer() {
+  try {
+    const [a, b, c, d] = await Promise.all([
+      import('three/addons/postprocessing/EffectComposer.js'), import('three/addons/postprocessing/RenderPass.js'),
+      import('three/addons/postprocessing/UnrealBloomPass.js'), import('three/addons/postprocessing/OutputPass.js'),
+    ]);
+    const rt = new THREE.WebGLRenderTarget(4, 4, { type: THREE.HalfFloatType, samples: SMALL ? 0 : 4 });
+    const comp = new a.EffectComposer(renderer, rt);
+    comp.setPixelRatio(PR);
+    comp.addPass(new b.RenderPass(scene, camera));
+    const bloom = new c.UnrealBloomPass(new THREE.Vector2(256, 256), SMALL ? 0.5 : 0.62, 0.55, 0.12);
+    comp.addPass(bloom); comp.addPass(new d.OutputPass());
+    const r = main.getBoundingClientRect(); comp.setSize(r.width, r.height);
+    composer = comp; bloomOn = true;
+  } catch (e) { composer = null; bloomOn = false; document.body.dataset.nobloom = String(e && e.message || e); }
 }
 
 // ------------------------------------------------------------------ loop
 function resize() {
   const r = main.getBoundingClientRect();
   renderer.setSize(r.width, r.height, false); labelRenderer.setSize(r.width, r.height);
+  if (composer) composer.setSize(r.width, r.height);
   camera.aspect = r.width / r.height; camera.updateProjectionMatrix();
 }
 window.addEventListener('resize', resize);
 let last = performance.now(), lastEmbed = last;
 function loop(now) {
+  requestAnimationFrame(loop);
+  if (paused || document.hidden) { last = lastEmbed = now; return; }
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   if (S.t !== S.target) { const k = 1 - Math.pow(0.0008, dt); S.t += (S.target - S.t) * k; if (Math.abs(S.target - S.t) < 0.002) S.t = S.target; applyExplode(); }
-  if (EMBED) embedStep(Math.min(0.3, (now - lastEmbed) / 1000)), lastEmbed = now; else controls.update();
-  if (paused) { requestAnimationFrame(loop); return; }
-  renderer.render(scene, camera); labelRenderer.render(scene, camera);
-  requestAnimationFrame(loop);
+  if (EMBED) embedStep(Math.min(0.3, (now - lastEmbed) / 1000), now), lastEmbed = now; else controls.update();
+  if (composer) { try { composer.render(); } catch (e) { composer = null; document.body.dataset.nobloom = String(e && e.message || e); } }
+  else renderer.render(scene, camera);
+  if (!EMBED) labelRenderer.render(scene, camera);
 }
 resize();
 readHash();

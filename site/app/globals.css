@@ -8,6 +8,8 @@
   --color-line: #2c2c2e;
   --color-sun: #ffb340;
   --color-sun-deep: #ff8a00;
+  --color-ice: #5ce1ff;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --font-sans: var(--font-sans), system-ui, sans-serif;
 }
 
@@ -22,3 +24,42 @@ html.lenis, html.lenis body { height: auto; }
 @keyframes breathe { 0%,100% { opacity: .75; transform: scale(1); } 50% { opacity: 1; transform: scale(1.06); } }
 .breathe { animation: breathe 5s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) { .ring, .breathe { animation: none; opacity: 0.3; } }
+
+/* ---- Solar grid: black, thin neon lines. Orange = energy (sun). Cyan = data (songs, sound). ---- */
+.kicker { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; }
+.glow-sun { text-shadow: 0 0 28px rgba(255, 138, 0, 0.42); }
+.glow-ice { text-shadow: 0 0 28px rgba(60, 220, 255, 0.35); }
+.btn-neon { display: inline-block; border-radius: 999px; background: #ffb340; color: #000; padding: 10px 20px; font-weight: 600; box-shadow: 0 0 0 1px rgba(255, 200, 120, 0.6), 0 0 26px rgba(255, 138, 0, 0.45); transition: filter .2s, box-shadow .2s; }
+.btn-neon:hover { filter: brightness(1.1); box-shadow: 0 0 0 1px rgba(255, 220, 160, 0.8), 0 0 36px rgba(255, 138, 0, 0.6); }
+
+/* heading with a thin glowing line under it */
+.sh::after { content: ""; display: block; width: 72px; height: 1px; margin: 20px auto 0; background: linear-gradient(90deg, transparent, #ffb340, transparent); box-shadow: 0 0 14px 1px rgba(255, 138, 0, 0.8); }
+
+/* 1px neon-edge panel with corner brackets */
+.panel { --c: rgba(255, 179, 64, 0.95); --edge: rgba(255, 179, 64, 0.22); position: relative; border: 1px solid var(--edge); border-radius: 4px; background: linear-gradient(180deg, rgba(255, 138, 0, 0.05), rgba(255, 255, 255, 0.012)); box-shadow: inset 0 0 40px rgba(255, 138, 0, 0.03); }
+.panel.ice { --c: rgba(92, 225, 255, 0.95); --edge: rgba(92, 225, 255, 0.22); background: linear-gradient(180deg, rgba(60, 220, 255, 0.05), rgba(255, 255, 255, 0.012)); box-shadow: inset 0 0 40px rgba(60, 220, 255, 0.03); }
+.panel::before { content: ""; position: absolute; inset: -1px; pointer-events: none; border-radius: 4px;
+  background:
+    linear-gradient(var(--c), var(--c)) top left / 14px 1px no-repeat, linear-gradient(var(--c), var(--c)) top left / 1px 14px no-repeat,
+    linear-gradient(var(--c), var(--c)) top right / 14px 1px no-repeat, linear-gradient(var(--c), var(--c)) top right / 1px 14px no-repeat,
+    linear-gradient(var(--c), var(--c)) bottom left / 14px 1px no-repeat, linear-gradient(var(--c), var(--c)) bottom left / 1px 14px no-repeat,
+    linear-gradient(var(--c), var(--c)) bottom right / 14px 1px no-repeat, linear-gradient(var(--c), var(--c)) bottom right / 1px 14px no-repeat;
+  filter: drop-shadow(0 0 3px var(--c)); }
+.panel:hover { --edge: rgba(255, 179, 64, 0.45); }
+.panel.ice:hover { --edge: rgba(92, 225, 255, 0.45); }
+.rule { border-color: rgba(255, 179, 64, 0.18); }
+
+/* faint perspective grid floor, fading to a sun-lit horizon */
+.solar-grid::before { content: ""; position: absolute; left: -50%; right: -50%; bottom: 0; height: 60%; transform-origin: 50% 100%; transform: perspective(520px) rotateX(64deg);
+  background-image: linear-gradient(rgba(92, 225, 255, 0.28) 1px, transparent 1px), linear-gradient(90deg, rgba(92, 225, 255, 0.28) 1px, transparent 1px); background-size: 64px 64px;
+  -webkit-mask-image: linear-gradient(to top, #000 0%, transparent 75%); mask-image: linear-gradient(to top, #000 0%, transparent 75%); opacity: 0.55; }
+.solar-grid::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 45%; background: radial-gradient(60% 100% at 50% 100%, rgba(255, 138, 0, 0.22), transparent 70%); }
+
+/* hero callouts: a dot on the part, a thin line, a mono label. Placed by script (translate in container units). */
+.callout { position: absolute; left: 0; top: 0; width: 0; height: 0; transition: opacity .3s; will-change: transform; }
+.callout i { position: absolute; left: -3px; top: -3px; width: 6px; height: 6px; border-radius: 50%; background: var(--k); box-shadow: 0 0 10px var(--k); }
+.callout b { position: absolute; top: 0; height: 1px; width: 44px; background: var(--k); opacity: .7; }
+.callout span { position: absolute; top: -8px; white-space: nowrap; color: var(--k); font-size: 11px; text-shadow: 0 0 10px var(--k); }
+.callout.sun { --k: #ffb340; } .callout.ice { --k: #5ce1ff; }
+.callout[data-side="r"] b { left: 0; } .callout[data-side="r"] span { left: 52px; }
+.callout[data-side="l"] b { right: 0; } .callout[data-side="l"] span { right: 52px; }
