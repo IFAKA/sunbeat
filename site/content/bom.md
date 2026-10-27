@@ -26,9 +26,9 @@ Warnings: the TRRS boards may come with loose header pins (soldering needed) and
 | Cell holder | Holds the coin cell on the board | Keystone 3034TR | 2 (1 used +1) | DigiKey.es | EUR 0.53 | 44,448 | https://www.digikey.es/en/products/result?keywords=3034TR | Active |
 | Harvester chip | Charges the battery from the cell | e-peas AEM10941-QFN (Mouser 120-AEM10941-QFN) | 2 (1+1) | Mouser | about USD 4.50 | NOT verified (Mouser page did not load; price sites show stock) | https://www.mouser.es/c/?q=AEM10941 | Active (e-peas product) |
 | Inductors L1, L2 | Coils for the harvester | TDK VLS252012CX-100M-1 | 4 (2+2) | DigiKey.es | EUR 0.31 cut tape | 10,668 | https://www.digikey.es/en/products/result?keywords=VLS252012CX-100M-1 | Active |
-| C1 10 uF 10 V | Cell input buffer | Murata GXT188R61A106KE13D | 3 (1+2) | DigiKey.es | not read | not read | https://www.digikey.es/en/products/result?keywords=GXT188R61A106KE13D | Active (not re-checked) |
+| C1 10 uF 10 V | Cell input buffer | Murata GRT188R61A106KE13J | 3 (1+2) | DigiKey.es | not read | not read | https://www.digikey.es/en/products/result?keywords=GRT188R61A106KE13J | Active (not re-checked) |
 | C2 22 uF | Boost buffer | Samsung CL21A226MQQNNNE | 3 (1+2) | DigiKey.es | not read | not read | https://www.digikey.es/en/products/result?keywords=CL21A226MQQNNNE | Active (not re-checked) |
-| C3, C4, C5 10 uF 6.3 V | Output buffers | Murata GRM188R60J106ME47D | 5 (3+2) | DigiKey.es | EUR 0.11 | 843,830 | https://www.digikey.es/en/products/result?keywords=GRM188R60J106ME47D | Active |
+| C3, C4, C5 10 uF 6.3 V | Output buffers | Murata GRM188R60J106ME84D | 5 (3+2) | DigiKey.es | EUR 0.11 | 843,830 | https://www.digikey.es/en/products/result?keywords=GRM188R60J106ME84D | Active |
 | R1, R4a 6.2 M | Battery limits | Yageo RC0402FR-076M2L | 4 (2+2) | DigiKey.es | not read (about 0.09) | not read | https://www.digikey.es/en/products/result?keywords=RC0402FR-076M2L | Active |
 | R2 1.2 M | Battery limits | Vishay CRCW04021M20FKED | 3 (1+2) | DigiKey.es | EUR 0.09 | in stock (count not shown) | https://www.digikey.es/en/products/result?keywords=CRCW04021M20FKED | Active |
 | R3 1.0 M | Battery limits | Yageo RC0402FR-071ML | 3 (1+2) | DigiKey.es | not read (about 0.09) | not read | https://www.digikey.es/en/products/result?keywords=RC0402FR-071ML | Active |
@@ -65,7 +65,7 @@ Basket: same shops as above. DigiKey.es part: about EUR 25 ex VAT. Add what is m
 
 ## Check of the parts (2026-10-27)
 
-Two capacitor numbers must be changed before ordering (see PROBLEM rows). Done by web search and page loads. DigiKey and Farnell block scripts, so their own pages were not opened; numbers come from search results. Nothing was ordered, so "can buy" means "a shop lists it", not "I received it".
+Two capacitor numbers were changed after this check (see FIXED rows). Done by web search and page loads. DigiKey and Farnell block scripts, so their own pages were not opened; numbers come from search results. Nothing was ordered, so "can buy" means "a shop lists it", not "I received it".
 
 | Part | Result | Note |
 |---|---|---|
@@ -78,8 +78,8 @@ Two capacitor numbers must be changed before ordering (see PROBLEM rows). Done b
 | SJ-43514-SMT-TR jack | Exists, about 8,000 to 13,000 in stock on DigiKey.com | OK |
 | CH340E | Exists, LCSC shows 14,000 to 57,000 in stock (pages differ) | OK. Not at Mouser or DigiKey. |
 | GRM155R61A104KA01D (0.1 uF) | Exists, about 2.8 million in stock at DigiKey | OK |
-| GRM188R60J106ME47D (10 uF, 6.3 V) | Exists but DigiKey showed 0 in stock (restock date 2026-10-09 already passed) | PROBLEM. Use GRM188R60J106ME84D instead: same size and values, 29,362 in stock. |
-| GXT188R61A106KE13D (10 uF, 10 V) | No page found for this exact number | PROBLEM. Use GRT188R61A106KE13J (10 uF, 10 V, 0603): 233 in stock at DigiKey. |
+| GRM188R60J106ME84D (10 uF, 6.3 V) | Exists but DigiKey showed 0 in stock (restock date 2026-10-09 already passed) | FIXED in the table above: now GRM188R60J106ME84D (29,362 in stock). |
+| GRT188R61A106KE13J (10 uF, 10 V) | No page found for this exact number | FIXED in the table above: now GRT188R61A106KE13J (233 in stock at DigiKey). |
 | CL21A226MQQNNNE (22 uF, 6.3 V, 0805) | Exists, active. LCSC about 3.8 million, also DigiKey, Farnell, TME | OK. DigiKey lead time is long (61 weeks), so buy where it is in stock. |
 | CL05A105KA5NQNC (1 uF) | Exists. TME about 99,000 in stock; LCSC showed 0 | OK, buy at TME. |
 | RC0402FR-071ML, -075K1L | Exist, DigiKey has stock (1.2 million for 1M) | OK |
@@ -88,7 +88,9 @@ Two capacitor numbers must be changed before ordering (see PROBLEM rows). Done b
 | VLS252012CX-100M-1 inductor | DigiKey.at: out of stock; TDK page shows DigiKey 760, Future 2,000, Oneyac 32,000 | Check live stock; fall back to Future Electronics. |
 | USB4105-GF-A USB-C | Exists, 30,000+ in stock | OK |
 | B3U-3000P-B button | Exists, about 12,900 in stock | OK (the button is not used now; the earbud button is the control). |
-| RC0402FR-076M2L, -075M1L, -074M7L | Not checked | Same Yageo series as the checked ones. |
+| RC0402FR-074M7L | Exists, 118,065 in stock at DigiKey | OK |
+| RC0402FR-075M1L | No DigiKey page found; broker sites show 10,000 to 28,000 | Check live stock. |
+| RC0402FR-076M2L (6.2 M) | No DigiKey page or stock found, only quote-request listings | RISK. Check the shop's own search; if missing, ask me for a value that is in stock and re-check R1 and R4a limits. |
 
 Shipping to Spain: Mouser.es is confirmed (prices include duty, free shipping over about EUR 75, per its own page). Farnell and LCSC Spain terms were not found. Check the cart before paying.
 

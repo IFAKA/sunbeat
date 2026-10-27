@@ -662,7 +662,7 @@ const S = { road: false, stage: 3, view: 'normal', panel: false, cam: 'back', na
 const $ = (id) => document.getElementById(id);
 
 function applyCaseOpacity() {
-  [4, 5].forEach((id) => Object.values(ST[id].parts).forEach((pt) => {
+  [4].forEach((id) => Object.values(ST[id].parts).forEach((pt) => {
     if (!pt.def.caseShell) return;
     pt.body.traverse((o) => { if (o.isMesh) { o.material.transparent = S.see; o.material.opacity = S.see ? 0.22 : 1; o.material.depthWrite = !S.see; } });
   }));
@@ -799,7 +799,7 @@ function writeHash() {
 }
 function readHash() {
   const q = new URLSearchParams(location.hash.replace(/^#/, ''));
-  const st = q.get('stage') === '5' ? 5 : q.get('stage') === '4' ? 4 : 3;
+  const st = ['4', '5'].includes(q.get('stage')) ? 4 : 3;
   S.panel = q.get('pcb') === '1' || q.get('wire') === '1'; S.road = q.get('road') === '1';
   S.cam = q.get('cam') === 'front' ? 'front' : 'back';
   if (q.get('names') === '0') { S.names = false; $('optNames').checked = false; }
