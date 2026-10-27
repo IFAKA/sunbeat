@@ -97,6 +97,17 @@
     #panel, #road { width:100%; }
   }
 </style>
+<script>if (new URLSearchParams(location.search).get('embed') === '1') document.documentElement.classList.add('embed');</script>
+<style>
+  /* Embed mode (?embed=1): only the 3D canvas, for the landing page */
+  html.embed, html.embed body { background:#000; overflow:hidden; }
+  html.embed #side, html.embed #labels, html.embed #size4, html.embed #card, html.embed #scalehint, html.embed #panel, html.embed #road, html.embed #err { display:none !important; }
+  html.embed #app { display:block; height:100%; }
+  html.embed #main { height:100% !important; width:100%; }
+  html.embed #gl { pointer-events:none; }
+  html.embed.drag #gl { pointer-events:auto; cursor:grab; }
+  html.embed.drag #gl:active { cursor:grabbing; }
+</style>
 <script type="importmap">
 { "imports": {
   "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
@@ -605,14 +616,19 @@ const BUILD = {
 // ------------------------------------------------------------------ scene
 const canvas = document.getElementById('gl');
 const main = document.getElementById('main');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+const QS = new URLSearchParams(location.search);
+const EMBED = QS.get('embed') === '1', DRAG = EMBED && QS.get('drag') === '1';
+if (DRAG) document.documentElement.classList.add('drag');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: EMBED, preserveDrawingBuffer: !EMBED });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, EMBED ? 1.75 : 2));
+renderer.setClearColor(0x000000, EMBED ? 0 : 1);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 const scene = new THREE.Scene();
-scene.background = new THREE.Color('#000000');
+if (!EMBED) scene.background = new THREE.Color('#000000');
 const camera = new THREE.PerspectiveCamera(38, 1, 1, 2000);
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true; controls.dampingFactor = 0.12;
+if (EMBED) { controls.enabled = false; canvas.style.touchAction = DRAG ? 'pan-y' : 'none'; } // embed: own camera, no zoom, page scroll stays free
 scene.add(new THREE.HemisphereLight('#ffffff', '#8a97a8', 1.25));
 const sun = new THREE.DirectionalLight('#ffffff', 1.5); sun.position.set(60, 140, 90); scene.add(sun);
 const fill = new THREE.DirectionalLight('#dfe8ff', 0.9); fill.position.set(-90, 40, -120); scene.add(fill);
@@ -737,7 +753,7 @@ function pick(ev) {
   return hit ? hit.object.userData.partId : null;
 }
 canvas.addEventListener('pointermove', (ev) => {
-  if (ev.buttons) return;
+  if (EMBED || ev.buttons) return;
   const id = pick(ev);
   if (id === S.hovered) return;
   if (S.hovered && S.hovered !== S.pinned) highlight(S.hovered, false);
@@ -748,7 +764,7 @@ canvas.addEventListener('pointermove', (ev) => {
 let downAt = null;
 canvas.addEventListener('pointerdown', (ev) => { downAt = [ev.clientX, ev.clientY]; });
 canvas.addEventListener('pointerup', (ev) => {
-  if (!downAt || Math.hypot(ev.clientX - downAt[0], ev.clientY - downAt[1]) > 4) return;
+  if (EMBED || !downAt || Math.hypot(ev.clientX - downAt[0], ev.clientY - downAt[1]) > 4) return;
   const id = pick(ev);
   if (S.pinned && S.pinned !== id) highlight(S.pinned, false);
   if (id) showCard(id, true); else { S.pinned = null; $('card').style.display = 'none'; }
@@ -799,7 +815,7 @@ function writeHash() {
 }
 function readHash() {
   const q = new URLSearchParams(location.hash.replace(/^#/, ''));
-  const st = ['4', '5'].includes(q.get('stage')) ? 4 : 3;
+  const st = EMBED || ['4', '5'].includes(q.get('stage')) ? 4 : 3;
   S.panel = q.get('pcb') === '1' || q.get('wire') === '1'; S.road = q.get('road') === '1';
   S.cam = q.get('cam') === 'front' ? 'front' : 'back';
   if (q.get('names') === '0') { S.names = false; $('optNames').checked = false; }
@@ -807,6 +823,7 @@ function readHash() {
   if (q.get('see') === '0') { S.see = false; $('optSee').checked = false; }
   setView(q.get('view') === 'exploded' ? 'exploded' : 'normal', true);
   setStage(st);
+  if (EMBED) initEmbed();
   $('btnPanel').classList.toggle('on', S.panel);
 }
 $('tab3').onclick = () => { S.panel = false; setStage(3); writeHash(); };
@@ -945,6 +962,86 @@ function pcbSvg() {
   return s + '</g></svg>';
 }
 
+
+// ------------------------------------------------------------------ embed mode (landing page)
+// The parent page sends {sunbeat:1, t, yaw, pitch, dist, zoom, focus, spin, paused}. We ease toward the latest values.
+// yaw 0 looks at the solar side, 180 at the back. t is the explode amount 0..1. dist is mm or 'fit'. focus is a part id or a list.
+const BASE_TARGET = new THREE.Vector3(0, 0, 5);
+const E = {
+  tgt: { t: 0, yaw: 25, pitch: 12, dist: 'fit', zoom: 1, spin: false },
+  cur: { t: 0, yaw: 25, pitch: 12, dist: 120, zoom: 1 },
+  focus: null, look: BASE_TARGET.clone(), speed: 10, // speed: ease rate per second
+};
+let paused = false;
+function initEmbed() {
+  S.names = false; S.grid = false;
+  Object.values(ST).forEach((st) => (st.grid.visible = false));
+  refreshLabels(); setView('normal', true);
+}
+function fitDist(t, zoom) {
+  const R = 36 + 22 * t; // radius that holds the device at any turn
+  return (R * 1.08) / (Math.tan((camera.fov * Math.PI) / 360) * Math.min(1, camera.aspect)) / zoom;
+}
+function applyDim(pt) {
+  const d = pt.dim;
+  pt.body.traverse((o) => {
+    if (!o.isMesh) return;
+    const m = o.material, u = m.userData;
+    if (!u.o0) u.o0 = { op: m.opacity, tr: m.transparent, dw: m.depthWrite };
+    const tr = u.o0.tr || d > 0.001;
+    m.opacity = u.o0.op * (1 - 0.9 * d); m.depthWrite = d > 0.001 ? false : u.o0.dw;
+    if (tr !== m.transparent) { m.transparent = tr; m.needsUpdate = true; } // the shader differs for opaque materials
+  });
+}
+function embedStep(dt) {
+  const { tgt, cur } = E; const k = 1 - Math.exp(-dt * E.speed);
+  if (tgt.spin) tgt.yaw += dt * 14;
+  for (const key of ['t', 'yaw', 'pitch', 'zoom']) cur[key] += (tgt[key] - cur[key]) * k;
+  const want = tgt.dist === 'fit' ? fitDist(cur.t, cur.zoom) : Number(tgt.dist);
+  cur.dist += (want - cur.dist) * k;
+  if (Math.abs(S.t - cur.t) > 0.0005) { S.t = cur.t; applyExplode(); }
+  // focus: dim the other parts and look at the focused ones
+  let box = null;
+  Object.entries(ST[S.stage].parts).forEach(([id, pt]) => {
+    const goal = E.focus && !E.focus.has(id) ? 1 : 0, d = pt.dim || 0;
+    if (d !== goal) { pt.dim = E.snap || Math.abs(goal - d) < 0.002 ? goal : d + (goal - d) * k; applyDim(pt); }
+    if (E.focus && E.focus.has(id)) { const b = new THREE.Box3().setFromObject(pt.node); box = box ? box.union(b) : b; }
+  });
+  E.look.lerp(box ? box.getCenter(new THREE.Vector3()) : BASE_TARGET, E.snap ? 1 : k); E.snap = false;
+  const y = (cur.yaw * Math.PI) / 180, p = (cur.pitch * Math.PI) / 180, c = Math.cos(p);
+  camera.position.set(E.look.x + cur.dist * c * Math.sin(y), E.look.y + cur.dist * Math.sin(p), E.look.z + cur.dist * c * Math.cos(y));
+  camera.lookAt(E.look);
+}
+function applyMessage(m) {
+  const { tgt } = E;
+  for (const key of ['yaw', 'pitch', 'zoom']) if (typeof m[key] === 'number') tgt[key] = m[key];
+  if (typeof m.t === 'number') tgt.t = Math.max(0, Math.min(1, m.t));
+  if (m.dist !== undefined) tgt.dist = m.dist;
+  if (m.spin !== undefined) tgt.spin = !!m.spin;
+  if (m.focus !== undefined) E.focus = m.focus ? new Set([].concat(m.focus)) : null;
+  if (m.speed) E.speed = m.speed;
+  if (m.snap) E.snap = true;
+  if (m.snap) Object.assign(E.cur, { t: tgt.t, yaw: tgt.yaw, pitch: tgt.pitch, zoom: tgt.zoom });
+  if (m.paused !== undefined) paused = !!m.paused;
+}
+if (EMBED) {
+  // start pose from the query string, e.g. ?embed=1&yaw=200&t=1&focus=battery,battery2 (also handy for tests)
+  const num = (k) => (QS.has(k) ? Number(QS.get(k)) : undefined);
+  applyMessage({ t: num('t'), yaw: num('yaw'), pitch: num('pitch'), zoom: num('zoom'), spin: QS.get('spin') === '1', focus: QS.get('focus') ? QS.get('focus').split(',') : undefined, snap: true });
+  window.addEventListener('message', (e) => { if (e.source === parent && e.data && e.data.sunbeat) applyMessage(e.data); });
+  if (DRAG) {
+    let drag = null;
+    canvas.addEventListener('pointerdown', (ev) => { drag = { x: ev.clientX, y: ev.clientY }; canvas.setPointerCapture(ev.pointerId); E.tgt.spin = false; });
+    canvas.addEventListener('pointermove', (ev) => {
+      if (!drag) return;
+      E.tgt.yaw -= (ev.clientX - drag.x) * 0.45; E.tgt.pitch = Math.max(-80, Math.min(80, E.tgt.pitch + (ev.clientY - drag.y) * 0.3));
+      drag = { x: ev.clientX, y: ev.clientY };
+    });
+    const end = () => { drag = null; };
+    canvas.addEventListener('pointerup', end); canvas.addEventListener('pointercancel', end);
+  }
+}
+
 // ------------------------------------------------------------------ loop
 function resize() {
   const r = main.getBoundingClientRect();
@@ -952,18 +1049,22 @@ function resize() {
   camera.aspect = r.width / r.height; camera.updateProjectionMatrix();
 }
 window.addEventListener('resize', resize);
-let last = performance.now();
+let last = performance.now(), lastEmbed = last;
 function loop(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   if (S.t !== S.target) { const k = 1 - Math.pow(0.0008, dt); S.t += (S.target - S.t) * k; if (Math.abs(S.target - S.t) < 0.002) S.t = S.target; applyExplode(); }
-  controls.update();
+  if (EMBED) embedStep(Math.min(0.3, (now - lastEmbed) / 1000)), lastEmbed = now; else controls.update();
+  if (paused) { requestAnimationFrame(loop); return; }
   renderer.render(scene, camera); labelRenderer.render(scene, camera);
   requestAnimationFrame(loop);
 }
 resize();
 readHash();
 requestAnimationFrame(loop);
-requestAnimationFrame(() => requestAnimationFrame(() => { document.body.dataset.ready = '1'; window.__viewerReady = true; }));
+requestAnimationFrame(() => requestAnimationFrame(() => {
+  document.body.dataset.ready = '1'; window.__viewerReady = true;
+  if (EMBED && parent !== window) parent.postMessage({ sunbeat: 1, ready: true }, '*');
+}));
 </script>
 </body>
 </html>

@@ -3,6 +3,8 @@ import Smooth from "@/components/Smooth";
 import Nav, { REPO } from "@/components/Nav";
 import Hero from "@/components/Hero";
 import Story from "@/components/Story";
+import Film from "@/components/Film";
+import Closer from "@/components/Closer";
 import Reading from "@/components/Reading";
 import Faq from "@/components/Faq";
 import Reveal from "@/components/Reveal";
@@ -55,6 +57,7 @@ export default function Home() {
       <main>
         <Hero />
         <Story />
+        <Film />
 
         <section id="highlights" className={sec}>
           <Reveal><h2 className={h2}>Get the highlights.</h2></Reveal>
@@ -91,15 +94,11 @@ export default function Home() {
         </section>
 
         <section id="inside" className={sec}>
-          <Reveal><h2 className={h2}>See every part.<br />At real size.</h2></Reveal>
-          <Reveal delay={0.1} className="mt-[3svh] w-full">
-            <a href="/build" className="group block overflow-hidden rounded-[22px] border border-line bg-black">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/inside.png" alt="The Sunbeat clip pulled apart: case, solar cell, circuit board, coin cell and clip" className="w-full transition-transform duration-700 group-hover:scale-[1.015]" />
-            </a>
-          </Reveal>
-          <Reveal delay={0.2}><a href="/build" className="mt-[3svh] inline-block rounded-full bg-sun px-6 py-3 text-[17px] font-semibold text-black hover:brightness-110">Open the 3D model</a></Reveal>
-          <p className="mt-3 text-sm text-mute">Pull it apart, hide any part, see the board and the wiring.</p>
+          <Reveal><h2 className={h2}>Take a closer look.</h2></Reveal>
+          <Reveal delay={0.1}><p className="mt-3 max-w-[32em] text-[clamp(16px,2.4svh,21px)] text-mute">The real parts of the clip, from the open design. Turn it. Pull it apart.</p></Reveal>
+          <Reveal delay={0.15} className="mt-[3svh] w-full"><Closer /></Reveal>
+          <Reveal delay={0.2}><a href="/build" className="mt-[4svh] inline-block rounded-full bg-sun px-6 py-3 text-[17px] font-semibold text-black hover:brightness-110">Open the full 3D model</a></Reveal>
+          <p className="mt-3 text-sm text-mute">Hide any part, see the board and the wiring.</p>
         </section>
 
         <section id="specs" className={sec}>

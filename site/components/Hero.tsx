@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "motion/react";
-import Sun from "./Sun";
+import Stage3D from "./Stage3D";
 import { REPO } from "./Nav";
 
 export default function Hero() {
@@ -17,7 +17,7 @@ export default function Hero() {
         <a href="/build" className="rounded-full bg-sun px-5 py-2.5 font-semibold text-black hover:brightness-110">See inside in 3D</a>
         <a href="#story" className="text-sun hover:underline">How it works ›</a>
       </motion.div>
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.2, delay: 0.6 }} className="relative mt-[3svh] h-[32svh] w-full shrink-0"><Sun /></motion.div>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.2, delay: 0.6 }} className="relative mt-[2svh] min-h-0 w-full flex-1"><Stage3D initial={{ t: 0, zoom: 1.2, yaw: 25, pitch: 12, spin: true, snap: true }} className="absolute inset-0" /></motion.div>
       <a href={REPO} className="sr-only">Source on GitHub</a>
     </section>
   );
