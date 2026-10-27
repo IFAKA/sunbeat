@@ -107,7 +107,7 @@ export default function Home() {
           <Reveal><Kicker>Open plan</Kicker></Reveal>
           <Reveal delay={0.05}><Heading mt={1}>Built in public.</Heading></Reveal>
           <Reveal delay={0.1}><Button href={REPO} mt={4}>Follow it on GitHub</Button></Reveal>
-          <Reveal delay={0.2} className="mt-[4svh] w-full"><Column><Faq /></Column></Reveal>
+          <Reveal delay={0.2} className="mt-[2svh] w-full"><Column><Faq /></Column></Reveal>
         </Section>
       </main>
       <Footer />

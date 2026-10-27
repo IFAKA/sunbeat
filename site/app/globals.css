@@ -78,6 +78,8 @@ html.lenis, html.lenis body { height: auto; }
   /* ---- Section ---- */
   .ui-section { @apply relative mx-auto flex w-full max-w-[1080px] flex-col items-center px-5 text-center; }
   .ui-section--full { @apply min-h-svh justify-center pb-[6svh] pt-[calc(4rem+4svh)]; }
+  @media (min-width: 1361px) { .ui-section--full { padding-block: 2svh; } }
+  @media (max-width: 1360px) { #faq { padding-top: 76px; padding-bottom: 32px; } #faq h2 { font-size: clamp(30px, 6svh, 46px); } }
   .ui-section--intro { @apply min-h-svh justify-center py-[calc(4rem+4svh)]; }
   .ui-section--page { @apply max-w-[760px] items-stretch pb-16 pt-28 text-left; }
   .ui-section--doc { @apply max-w-[820px] items-stretch pb-16 pt-28 text-left; }
@@ -170,12 +172,12 @@ html.lenis, html.lenis body { height: auto; }
   .ui-list > li + li { margin-top: 12px; }
   .ui-list li { font-size: clamp(14px, 2svh, 17px); line-height: 1.35; }
   .ui-list b { margin-right: 8px; font-size: var(--text-label); font-weight: 600; color: var(--color-mute); }
-  .ui-disclosure { padding-block: 12px; }
+  .ui-disclosure { padding-block: clamp(3px, 0.7svh, 14px); }
   .ui-disclosure summary { display: flex; cursor: pointer; list-style: none; align-items: center; justify-content: space-between; font-size: var(--text-body); font-weight: 500; }
   .ui-disclosure summary::-webkit-details-marker { display: none; }
   .ui-disclosure summary i { font-style: normal; color: var(--color-sun); transition: transform .2s; }
   .ui-disclosure[open] summary i { transform: rotate(45deg); }
-  .ui-disclosure p { padding-top: 8px; font-size: var(--text-small); line-height: 1.35; color: var(--color-mute); }
+  .ui-disclosure .ui-answer { margin-top: 10px; font-size: var(--text-small); line-height: 1.35; color: var(--color-mute); }
   .ui-toolbar { @apply mb-3 flex items-center justify-end gap-4; color: var(--color-mute); font-size: var(--text-label); }
   .ui-card { display: block; border-radius: var(--radius-card); background: var(--color-card); padding: 24px; transition: background .2s; }
   .ui-card:hover { background: var(--color-card-hi); }

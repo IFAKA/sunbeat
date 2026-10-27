@@ -46,7 +46,7 @@ export function Disclosure({ summary, open, onToggle, children }: { summary: str
   return (
     <details open={open} onToggle={(e) => onToggle(e.currentTarget.open)} className="ui-disclosure">
       <summary>{summary}<i>+</i></summary>
-      <p>{children}</p>
+      {open && <div className="ui-answer">{children}</div>}
     </details>
   );
 }
