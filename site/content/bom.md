@@ -29,10 +29,10 @@ Warnings: the TRRS boards may come with loose header pins (soldering needed) and
 | C1 10 uF 10 V | Cell input buffer | Murata GRT188R61A106KE13J | 3 (1+2) | DigiKey.es | not read | not read | https://www.digikey.es/en/products/result?keywords=GRT188R61A106KE13J | Active (not re-checked) |
 | C2 22 uF | Boost buffer | Samsung CL21A226MQQNNNE | 3 (1+2) | DigiKey.es | not read | not read | https://www.digikey.es/en/products/result?keywords=CL21A226MQQNNNE | Active (not re-checked) |
 | C3, C4, C5 10 uF 6.3 V | Output buffers | Murata GRM188R60J106ME84D | 5 (3+2) | DigiKey.es | EUR 0.11 | 843,830 | https://www.digikey.es/en/products/result?keywords=GRM188R60J106ME84D | Active |
-| R1, R4a 6.2 M | Battery limits | Yageo RC0402FR-076M2L | 4 (2+2) | DigiKey.es | not read (about 0.09) | not read | https://www.digikey.es/en/products/result?keywords=RC0402FR-076M2L | Active |
+| R1b, R4a2 1.5 M | Battery limits (in series with a 4.7 M, together 6.2 M) | Yageo RC0402FR-071M5L (1%) | 4 (2+2) | DigiKey.es | not read (about 0.09) | not confirmed (the 6.2 M part has no normal stock) | https://www.digikey.es/en/products/result?keywords=RC0402FR-071M5L | Active |
 | R2 1.2 M | Battery limits | Vishay CRCW04021M20FKED | 3 (1+2) | DigiKey.es | EUR 0.09 | in stock (count not shown) | https://www.digikey.es/en/products/result?keywords=CRCW04021M20FKED | Active |
 | R3 1.0 M | Battery limits | Yageo RC0402FR-071ML | 3 (1+2) | DigiKey.es | not read (about 0.09) | not read | https://www.digikey.es/en/products/result?keywords=RC0402FR-071ML | Active |
-| R4b, R6 4.7 M | Battery limits, output | Yageo RC0402FR-074M7L | 4 (2+2) | DigiKey.es | not read (about 0.09) | not read | https://www.digikey.es/en/products/result?keywords=RC0402FR-074M7L | Active |
+| R1a, R4a1, R4b, R6 4.7 M | Battery limits, output | Yageo RC0402FR-074M7L | 6 (4+2) | DigiKey.es | not read (about 0.09) | not read | https://www.digikey.es/en/products/result?keywords=RC0402FR-074M7L | Active |
 | R5 5.1 M | Output voltage | Yageo RC0402FR-075M1L | 3 (1+2) | DigiKey.es | not read (about 0.09) | not read | https://www.digikey.es/en/products/result?keywords=RC0402FR-075M1L | Active |
 | R7 4.7 k | Sound resistor | Yageo RC0402FR-074K7L | 3 (1+2) | DigiKey.es | EUR 0.09 | 983,617 | https://www.digikey.es/en/products/result?keywords=RC0402FR-074K7L | Active |
 | R8, R9 5.1 k | USB-C CC | Yageo RC0402FR-075K1L | 4 (2+2) | DigiKey.es | not read (about 0.09) | not read | https://www.digikey.es/en/products/result?keywords=RC0402FR-075K1L | Active |
@@ -90,7 +90,7 @@ Two capacitor numbers were changed after this check (see FIXED rows). Done by we
 | B3U-3000P-B button | Exists, about 12,900 in stock | OK (the button is not used now; the earbud button is the control). |
 | RC0402FR-074M7L | Exists, 118,065 in stock at DigiKey | OK |
 | RC0402FR-075M1L | No DigiKey page found; broker sites show 10,000 to 28,000 | Check live stock. |
-| RC0402FR-076M2L (6.2 M) | Real Yageo part, but only broker lots found (40,000 to 60,000, old date codes); no authorized shop stock seen | RISK. Fallback with no new risk: two resistors in series, 4.7 M (RC0402FR-074M7L, 118,065 in stock) + 1.5 M (RC0402FR-071M5L, 1%, exists; DigiKey stock not confirmed; the 5% version has 68,168 in stock but moves the limit) = 6.2 M. Needs 2 pads per resistor on the board. |
+| RC0402FR-076M2L (6.2 M) | Real Yageo part, but only broker lots found (40,000 to 60,000, old date codes); no authorized shop stock seen | CHANGED: the design now uses two resistors in series instead (board has 9 setting resistors, not 7). Details: two resistors in series, 4.7 M (RC0402FR-074M7L, 118,065 in stock) + 1.5 M (RC0402FR-071M5L, 1%, exists; DigiKey stock not confirmed; the 5% version has 68,168 in stock but moves the limit) = 6.2 M. Needs 2 pads per resistor on the board. |
 
 Shipping to Spain: Mouser.es is confirmed (prices include duty, free shipping over about EUR 75, per its own page). Farnell and LCSC Spain terms were not found. Check the cart before paying.
 
