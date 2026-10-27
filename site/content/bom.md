@@ -63,6 +63,22 @@ Parts total ex VAT (with spares, without PCB, case, shipping): about EUR 88 (one
 
 Basket: same shops as above. DigiKey.es part: about EUR 25 ex VAT. Add what is missing for the PCB order.
 
+## Check of the parts (2026-10-27)
+
+Done by web search and page loads. DigiKey and Farnell block scripts, so their own pages were not opened; numbers come from search results. Nothing was ordered, so "can buy" means "a shop lists it", not "I received it".
+
+| Part | Result | Note |
+|---|---|---|
+| AMG-1401C solar cell | Exists, in stock (Farnell/element14 1,177; Newark 1,163) | Panasonic's own page gives a 404 now, so the link is the Farnell page. Spain shipping not checked. Newark lead time for more is 52 weeks. |
+| AEM10941-QFN | Exists, in stock at Mouser (about 7,500 on the UK page) | DigiKey does not list it. |
+| W25N01GVZEIG flash | Exists, LCSC shows about 1,300 in stock | Spain shipping not checked. |
+| Artemis module WRL-15484 | SparkFun still sells it; Pimoroni dropped it, Amazon UK unavailable | Buy it at SparkFun. Live stock not confirmed. |
+| ML2032 (Jauch) | Listed at DigiKey, but 22 weeks lead time and a notice that air shipping is not available | RISK. Maxell ML2032 is sold on eBay, Amazon and Console5 as a backup. Find a second source before you order. |
+| Keystone 3034TR holder | Exists, over 100,000 in stock on DigiKey sites | OK |
+| SJ-43514-SMT-TR jack | Exists, about 8,000 to 13,000 in stock on DigiKey.com | OK |
+| CH340E | LCSC page loads | Stock number not read. |
+| Resistors, capacitors, inductor, USB-C, button | Not checked one by one | Common parts. DigiKey search links are not verified. |
+
 ## Power check (datasheet numbers)
 
 - AEM10941: solar input at most 5 V (5.5 V absolute max), cold start 380 mV. AMG-1401C: 2.7 V open circuit at 200 lux (2.3 V minimum), about 2.9 V at 1000 lux, estimated 3.6 to 4 V outdoors (the datasheet curve stops at 1000 lux). OK.

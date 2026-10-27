@@ -366,7 +366,7 @@ const NETS = {
 
 // ---------------------------------------------------------------- shared layout (41.4 x 52.2 board, two solar cells, two batteries)
 const AMG = (tiles) => ({ model: tiles > 1 ? '2 x Panasonic Amorton AMG-1401C' : 'Panasonic Amorton AMG-1401C', label: 'AMG-1401C', w: 41.4, h: 26.1 * tiles, t: 1.3, tiles,
-  source: 'https://industry.panasonic.eu/products/energy-building/amorphous-solar-cells/amorton-indoor-environment (datasheet: 41.4 x 26.1 x 1.3 mm max; at 200 lux Voc 2.7 V (min 2.3), Isc 43.3 uA, Vpm 2.1 V, Ipm 35.4 uA, Pm 74.3 uW each). Shop: Farnell order code 4531800 (at.farnell.com page: 1,177 in stock, EUR 8.63; Spain page not checked); lifecycle: active.' + (tiles > 1 ? ' Two cells side by side, joined in parallel.' : '') });
+  source: 'https://at.farnell.com/en-AT/panasonic/amg-1401c/solarzelle-35-4ua-41-4-x-26-1/dp/4531800 (datasheet: 41.4 x 26.1 x 1.3 mm max; at 200 lux Voc 2.7 V (min 2.3), Isc 43.3 uA, Vpm 2.1 V, Ipm 35.4 uA, Pm 74.3 uW each). Shop: Farnell order code 4531800 (at.farnell.com page: 1,177 in stock, EUR 8.63; Spain page not checked); lifecycle: active.' + (tiles > 1 ? ' Two cells side by side, joined in parallel.' : '') });
 
 const layout = (dy, second) => {
   const Y = (y) => y + dy;
