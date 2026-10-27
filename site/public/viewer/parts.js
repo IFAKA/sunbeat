@@ -94,7 +94,7 @@ export const stage3 = {
     },
     {
       id: 'pico-bootsel', group: 0, name: 'BOOTSEL button', short: 'BOOTSEL',
-      role: 'Hold it while you plug in USB to load new software. It also works as a backup button.',
+      role: 'Hold it while you plug in USB to load new software. It is only for loading software.',
       size: [5.0, 2.0, 3.8], dimOrder: 'xzy', pos: [picoX(13.5), PICO.top + 1.0, -3.2], explode: [0, 54, 0],
       build: { kind: 'tact' },
       source: 'estimate (size and place from photos).',
@@ -243,10 +243,6 @@ const META = {
     role: 'Your earbud plug goes in here, at the edge of the case. Its 4th pole (S) carries your earbud button to the chip: the chip feeds it a small voltage for about 1 ms every 20 ms and reads it, about 1 uW.',
     build: { kind: 'smdJack', w: 6.7, l: 17.0, h: 5.0 },
     source: DK('SJ-43514-SMT-TR') + ' (Same Sky SJ-43514-SMT-TR, 17 x 6.7 x 5 mm; 10,933 in stock, EUR 1.35 ex VAT; lifecycle: active; LCSC lists 18 x 6.8 x 5.05).' },
-  button: { group: G_BRAIN, name: 'Backup side button (SMD)', short: 'Button',
-    role: 'A backup button, in case your earbud button does not read well. The main control is your earbud button. Remove it once the earbud button is proven.',
-    build: { kind: 'sideButton' }, dimText: '2.5 x 3.0 x 1.2 mm (plunger faces the edge)',
-    source: 'https://www.digikey.es/en/products/result?keywords=B3U-3000P-B (Omron/Aratas B3U-3000P-B, side-press, 1.2 x 3 x 2.5 mm from the Omron datasheet; 18,109 in stock, about EUR 0.55; lifecycle: active). Cap and slot design: estimate.' },
   usbc: { group: G_USB, name: 'USB-C socket (GCT USB4105-GF-A)', short: 'USB-C',
     role: 'Plug into your laptop to add songs. Uses no battery when unplugged. USB emergency charging: not designed yet.',
     build: { kind: 'usbc' }, source: SRC_USBC + '.' },
@@ -335,16 +331,10 @@ function makeDevice(cfg) {
   const cuts = cfg.cuts(PL, ZB);
   parts.push({
     id: 'case-back', group: G_CASE, name: 'Case back shell', short: 'Back shell',
-    role: 'The back of the case. It covers the parts. It has holes for the jack and the USB-C plug and a slot for the backup button.',
+    role: 'The back of the case. It covers the parts. It has holes for the jack and the USB-C plug .',
     size: [DEV.outW, DEV.outH, DEV.zSeam], dimOrder: 'xyz', pos: [0, 0, 0], explode: [0, 0, -26], caseShell: true,
     build: { kind: 'caseBack', cuts },
     source: `estimate (my design). Wall ${DEV.wall} mm.`,
-  });
-  parts.push({
-    id: 'button-cap', group: G_CASE, name: 'Button cap', short: 'Button cap', minor: true,
-    role: 'A small plastic cap in the side slot. It pushes the button inside.',
-    size: [1.4, 3.0, 1.8], dimOrder: 'xyz', pos: [DEV.outW / 2 - 0.7, PL.button.y, ZB - 0.6], explode: [0, 0, -26],
-    build: { kind: 'box', color: '#d9d9de' }, source: 'estimate (my design).',
   });
   parts.push({
     id: 'clip', group: G_CASE, name: 'Spring clip (like a nano clip)', short: 'Clip',
@@ -367,7 +357,7 @@ const NETS = {
   battery: { color: '#2d7de1', name: 'Harvester <-> battery (BATT)' },
   power: { color: '#d63b3b', name: 'Harvester low-voltage out -> chip power' },
   audio: { color: '#1a9a55', name: 'Chip pin -> 4.7k -> 1uF -> jack tip + ring 1' },
-  button: { color: '#8a4fd0', name: 'Backup button -> chip input' },
+  mic: { color: '#8a4fd0', name: 'Jack S pole (earbud button) -> chip input' },
   usb: { color: '#f2f2f2', name: 'USB-C data (D+, D-) and CC -> USB chip' },
   vbus: { color: '#ff6a2a', name: 'USB 5 V (VBUS) -> USB chip only' },
   uart: { color: '#22c8d8', name: 'USB chip -> Artemis serial (TX, RX)' },
@@ -389,7 +379,6 @@ const layout = (dy, second) => {
     { id: 'aem', x: 15.5, y: Y(-3.0), w: 5, h: 5, z: 0.85, kind: 'qfn', ref: 'U1' },
     { id: 'l-boost', x: 15.5, y: Y(1.5), w: 2.5, h: 2.0, z: 1.2, kind: 'inductor', ref: 'L1' },
     { id: 'l-buck', x: 15.5, y: Y(4.6), w: 2.5, h: 2.0, z: 1.2, kind: 'inductor', ref: 'L2' },
-    { id: 'button', x: 19.2, y: Y(3.0), w: 2.5, h: 3.0, z: 1.2, kind: 'button', ref: 'SW1' },
     // front side (the solar cell sits 1.5 mm in front of the board)
     { id: 'c-src', side: 'f', x: 11.8, y: Y(-2.2), w: 0.8, h: 1.6, z: 0.8, kind: 'p0603', color: '#a5844f', ref: 'C1' },
     { id: 'c-boost', side: 'f', x: 11.8, y: Y(1.0), w: 1.25, h: 2.0, z: 1.25, kind: 'p0603', color: '#a5844f', ref: 'C2' },
@@ -420,7 +409,7 @@ const layout = (dy, second) => {
     T('audio', 'f', [4.5, -10.2], [5.0, -10.2]),
     T('audio', 'b', [5.0, -10.2], [5.0, -9.45], [5.65, -9.45]),
     T('audio', 'b', [5.0, -10.2], [5.0, -13.85], [5.65, -13.85]),
-    T('button', 'b', [18.2, 3.0], [18.2, 6.485], [10.9, 6.485]),
+    T('mic', 'b', [9.45, -9.45], [9.45, -8.8], [7.02, -8.8], [7.02, -7.75]),
     T('reset', 'f', [-0.3, 10.0], [0.6, 10.0], [0.6, 5.215]),
     T('reset', 'b', [0.6, 5.215], [1.0, 5.215]),
     T('uart', 'f', [-0.3, 10.5], [0.0, 10.5], [0.0, 3.945]),
@@ -463,7 +452,6 @@ const L_MINI = layout(0, false), L_BIG = layout(11.1, true);
 const COMMON_CUTS = (PL, ZB) => [
   { id: 'jack', side: 'x+', at: PL.jack.y, z: ZB - 2.5, a: 5.0, b: 4.2 },
   { id: 'usbc', side: 'y+', at: PL.usbc.x, z: ZB - 1.655, a: 9.4, b: 3.7 },
-  { id: 'button', side: 'x+', at: PL.button.y, z: ZB - 0.6, a: 3.2, b: 1.8 },
 ];
 
 const big = makeDevice({
