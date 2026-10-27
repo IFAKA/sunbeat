@@ -21,21 +21,21 @@ const HIGHLIGHTS = [
 ] as const;
 
 const NUMBERS = [
-  ["74 µW", "from room light", "Solar cell power at 200 lux. Datasheet, one cell."],
-  ["1.5 h", "of songs a day", "Kept up for ever on 8 hours of room light. Estimate."],
+  ["149 µW", "from room light", "Two solar cells at 200 lux. Datasheet: 74 µW each."],
+  ["3 h", "of songs a day", "Kept up for ever on 8 hours of room light. Estimate."],
   ["490 h", "with no light", "A full coin cell, songs only. Best case. Estimate."],
   ["150", "songs on board", "128 MB, 8 kHz, about 9 hours."],
 ] as const;
 
 const SPECS = [
-  ["Size", "44.0 × 32.6 × 10.8 mm (12.6 mm with the clip)"],
-  ["Volume", "15.5 cm³"],
-  ["Solar cell", "Panasonic AMG-1401C, 10.8 cm²"],
-  ["Battery", "ML2032 coin cell, 65 mAh, 195 mWh"],
+  ["Size", "44.4 × 55.2 × 11.2 mm (13.0 mm with the clip)"],
+  ["Volume", "27.4 cm³"],
+  ["Solar cell", "2 × Panasonic AMG-1401C, 21.6 cm²"],
+  ["Battery", "2 × ML2032 coin cell, 65 mAh each, 390 mWh"],
   ["Chip", "Ambiq Apollo3 (Artemis) module"],
   ["Songs", "Winbond 128 MB flash, 8 kHz, about 9 h"],
   ["Sound", "1-bit pin through a resistor and capacitor to a 3.5 mm jack"],
-  ["Parts cost", "About 78 € ex VAT, parts only (estimate)"],
+  ["Parts cost", "About 88 € ex VAT, parts only (estimate)"],
 ] as const;
 
 const STATUS = [
