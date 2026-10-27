@@ -5,7 +5,7 @@ import "./globals.css";
 const sans = Inter({ variable: "--font-sans", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://sunbeat.vercel.app"),
+  metadataBase: new URL("https://sunbeat-black.vercel.app"),
   title: "Sunbeat: music that never needs charging",
   description: "A tiny clip with a solar cell that plays your own songs through your own wired earbuds. Room light keeps it going. A concept with a real 3D model, parts list and open plan.",
   openGraph: { title: "Sunbeat", description: "Music that never needs charging.", images: ["/social.png"] },

@@ -7,7 +7,7 @@
 **Music that never needs charging.**<br>
 A clip with a solar cell. Your own songs. Your own wired earbuds.
 
-[**Website**](https://sunbeat.vercel.app) &nbsp;·&nbsp; [**3D model**](https://sunbeat.vercel.app/build) &nbsp;·&nbsp; [**Desk test**](#try-it-today) &nbsp;·&nbsp; [**Honest status**](#honest-status)
+[**Website**](https://sunbeat-black.vercel.app) &nbsp;·&nbsp; [**3D model**](https://sunbeat-black.vercel.app/build) &nbsp;·&nbsp; [**Desk test**](#try-it-today) &nbsp;·&nbsp; [**Honest status**](#honest-status)
 
 </div>
 
@@ -37,7 +37,7 @@ Sound comes from one pin (1-bit PWM) through a resistor and a capacitor. The ear
 | Song memory | 128 MB, about 9 h | same |
 | Parts cost (ex VAT, no PCB or case) | ~78 € | ~88 € |
 
-Chosen from common parts sold in Spain (Panasonic AMG-1401C cell, Ambiq Apollo3 module, AEM10941 harvester, Winbond W25N01GV flash). See [the parts list](https://sunbeat.vercel.app/docs/bom).
+Chosen from common parts sold in Spain (Panasonic AMG-1401C cell, Ambiq Apollo3 module, AEM10941 harvester, Winbond W25N01GV flash). See [the parts list](https://sunbeat-black.vercel.app/docs/bom).
 
 ## Try it today
 
