@@ -79,7 +79,7 @@ export default function Film() {
         <div className="pointer-events-none absolute inset-x-0 top-0 h-[36%] md:inset-y-0 md:right-auto md:h-full md:w-[40%]">
           <div className="relative h-full">
             {BEATS.map((b, i) => (
-              <div key={b.h} ref={(el) => { caps.current[i] = el; }} style={{ opacity: i === 0 ? 1 : 0 }} className="absolute inset-x-5 top-[calc(48px+3svh)] md:left-[max(20px,calc((100vw-1080px)/2+20px))] md:right-4 md:top-1/2 md:-translate-y-1/2">
+              <div key={b.h} ref={(el) => { caps.current[i] = el; }} style={{ opacity: i === 0 ? 1 : 0 }} className="absolute inset-x-5 top-[calc(56px+6svh)] md:left-[max(20px,calc((100vw-1080px)/2+20px))] md:right-4 md:top-1/2 md:-translate-y-1/2">
                 <Kicker>{b.k}</Kicker>
                 <Heading level="beat" glow="sun" mt={1}>{b.h}</Heading>
                 <Text size="lead" tone="mute" mt={2} className="max-w-[26em]">{b.d}</Text>

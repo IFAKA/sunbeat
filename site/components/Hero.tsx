@@ -29,7 +29,7 @@ export default function Hero() {
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.2, delay: 0.4 }} className="absolute inset-x-0 bottom-0 top-[44%] [container-type:size] md:top-[36%]">
         <Stage3D ref={stage} keepSpin initial={{ t: 0, yaw: 38, pitch: 14, spin: true, snap: true }} className="absolute inset-0" />
       </motion.div>
-      <div className="pointer-events-none relative z-10 mx-auto flex max-w-[1080px] flex-col items-center px-5 pt-[calc(56px+3svh)]">
+      <div className="pointer-events-none relative z-10 mx-auto flex max-w-[1080px] flex-col items-center px-5 pt-[calc(56px+6svh)]">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 0.61, 0.36, 1] }}>
           <Heading level="display">Never <Accent glow>charge.</Accent></Heading>
         </motion.div>
@@ -41,7 +41,7 @@ export default function Hero() {
           <Link href="#film" size="lead">Get the highlights ›</Link>
         </motion.div>
       </div>
-      <Kicker tone="mute" size="small" className="absolute bottom-3 left-1/2 -translate-x-1/2">Drag to turn it</Kicker>
+      <Kicker tone="mute" size="small" className="absolute bottom-[5svh] left-1/2 -translate-x-1/2">Drag to turn it</Kicker>
       <a href={REPO} className="sr-only">Source on GitHub</a>
     </section>
   );

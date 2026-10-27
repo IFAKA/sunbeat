@@ -41,15 +41,15 @@
   --text-stat: clamp(32px, 6svh, 52px);
   --text-stat--line-height: 1;
   --text-stat--letter-spacing: -0.04em;
-  --text-lead: clamp(16px, 2.4svh, 21px);
+  --text-lead: clamp(14px, 2.4svh, 21px);
   --text-body: 17px;
   --text-small: 15px;
   --text-fine: 13px;
   --text-label: 12px;
 
   /* spacing scale used by the kit's `mt` prop */
-  --space-1: 0.5rem;
-  --space-2: 0.9rem;
+  --space-1: 0.75rem;
+  --space-2: 1.1rem;
   --space-3: 2.4svh;
   --space-4: 3.4svh;
   --space-5: 4.4svh;
@@ -77,8 +77,8 @@ html.lenis, html.lenis body { height: auto; }
 @layer components {
   /* ---- Section ---- */
   .ui-section { @apply relative mx-auto flex w-full max-w-[1080px] flex-col items-center px-5 text-center; }
-  .ui-section--full { @apply min-h-svh justify-center pb-8 pt-20; }
-  .ui-section--intro { @apply pb-6 pt-[22svh]; }
+  .ui-section--full { @apply min-h-svh justify-center pb-[6svh] pt-[calc(4rem+4svh)]; }
+  .ui-section--intro { @apply min-h-svh justify-center py-[calc(4rem+4svh)]; }
   .ui-section--page { @apply max-w-[760px] items-stretch pb-16 pt-28 text-left; }
   .ui-section--doc { @apply max-w-[820px] items-stretch pb-16 pt-28 text-left; }
   .ui-section--bar { @apply max-w-[1080px] items-stretch py-8 text-left; }
