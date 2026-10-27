@@ -133,7 +133,7 @@
     <div class="hint">Drag to turn. Scroll to zoom. Click a part to read about it.</div>
     <div hidden>
       <button id="btnRoad"></button><div id="intro"></div><button id="btnReset"></button><button id="btnFront"></button>
-      <input type="checkbox" id="optNames" checked><input type="checkbox" id="optMinor"><input type="checkbox" id="optGrid" checked>
+      <input type="checkbox" id="optNames"><input type="checkbox" id="optMinor"><input type="checkbox" id="optGrid" checked>
       <span id="optSeeWrap"><input type="checkbox" id="optSee" checked></span><button id="allOn"></button><button id="allOff"></button>
     </div>
   </aside>
@@ -680,7 +680,7 @@ function buildStage(def) {
 buildStage(stage3); buildStage(stage4);
 
 // ------------------------------------------------------------------ state + UI
-const S = { road: false, stage: 3, view: 'normal', panel: false, cam: 'back', names: true, minor: false, grid: true, see: true, t: 0, target: 0, pinned: null, hovered: null };
+const S = { road: false, stage: 3, view: 'normal', panel: false, cam: 'back', names: false, minor: false, grid: true, see: true, t: 0, target: 0, pinned: null, hovered: null };
 const $ = (id) => document.getElementById(id);
 
 function applyCaseOpacity() {
@@ -824,7 +824,7 @@ function readHash() {
   const st = EMBED || ['4', '5'].includes(q.get('stage')) ? 4 : 3;
   S.panel = q.get('pcb') === '1' || q.get('wire') === '1'; S.road = q.get('road') === '1';
   S.cam = q.get('cam') === 'front' ? 'front' : 'back';
-  if (q.get('names') === '0') { S.names = false; $('optNames').checked = false; }
+  if (q.get('names') === '1') { S.names = true; $('optNames').checked = true; }
   if (q.get('minor') === '1') { S.minor = true; $('optMinor').checked = true; }
   if (q.get('see') === '0') { S.see = false; $('optSee').checked = false; }
   setView(q.get('view') === 'exploded' ? 'exploded' : 'normal', true);
@@ -985,25 +985,57 @@ const ORANGE = new Set(['solar', 'battery', 'battery2', 'aem', 'l-boost', 'l-buc
 const EDGE = { orange: new THREE.Color(0xffa030).multiplyScalar(1.7), shell: new THREE.Color(0xb7c4d6), pcb: new THREE.Color(0xb0b0b0).multiplyScalar(0.7), other: new THREE.Color(0xffa030).multiplyScalar(1.3) };
 let floor = null, composer = null, bloomOn = false, SPHERE = { c: new THREE.Vector3(0, 0, 5), r: 60 }, boxes = {};
 
-// Tron look: thin glowing edges on every part, a darker glassy fill.
+// Silhouette outline: for every mesh edge we keep the normals of its two faces. A shader draws the edge only when one face
+// looks at the camera and the other looks away, so only the outer border seen from the camera is drawn (no inner or hidden edges).
+function silhouetteGeometry(geo) {
+  const g = geo.index ? geo.toNonIndexed() : geo;
+  const pos = g.attributes.position, key = (i) => `${Math.round(pos.getX(i) * 500)},${Math.round(pos.getY(i) * 500)},${Math.round(pos.getZ(i) * 500)}`;
+  const edges = new Map(), A = new THREE.Vector3(), B = new THREE.Vector3(), C = new THREE.Vector3(), N = new THREE.Vector3();
+  for (let t = 0; t + 2 < pos.count; t += 3) {
+    A.fromBufferAttribute(pos, t); B.fromBufferAttribute(pos, t + 1); C.fromBufferAttribute(pos, t + 2);
+    N.crossVectors(B.clone().sub(A), C.clone().sub(A)); if (N.lengthSq() < 1e-12) continue; N.normalize();
+    for (let e = 0; e < 3; e++) {
+      const i0 = t + e, i1 = t + ((e + 1) % 3), k0 = key(i0), k1 = key(i1), k = k0 < k1 ? k0 + '|' + k1 : k1 + '|' + k0;
+      const rec = edges.get(k); if (rec) rec.n2 = N.clone(); else edges.set(k, { i0, i1, n1: N.clone(), n2: null });
+    }
+  }
+  const P = [], N1 = [], N2 = [];
+  edges.forEach((r) => {
+    const n2 = r.n2 || r.n1.clone().negate(); // a lone border edge (thin plane) is always an outline
+    if (r.n2 && r.n1.dot(r.n2) > 0.999) return; // flat: no edge
+    [r.i0, r.i1].forEach((i) => { P.push(pos.getX(i), pos.getY(i), pos.getZ(i)); N1.push(r.n1.x, r.n1.y, r.n1.z); N2.push(n2.x, n2.y, n2.z); });
+  });
+  const out = new THREE.BufferGeometry();
+  out.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); out.setAttribute('n1', new THREE.Float32BufferAttribute(N1, 3)); out.setAttribute('n2', new THREE.Float32BufferAttribute(N2, 3));
+  return out;
+}
+function silhouetteMaterial(color) {
+  return new THREE.ShaderMaterial({
+    transparent: true, depthWrite: false, uniforms: { uCol: { value: color }, uOp: { value: 0 } },
+    vertexShader: `attribute vec3 n1; attribute vec3 n2; varying float vOk;
+      void main(){ vec4 w = modelMatrix*vec4(position,1.); vec3 v = cameraPosition - w.xyz;
+        vOk = dot(normalize(mat3(modelMatrix)*n1), v) * dot(normalize(mat3(modelMatrix)*n2), v) < 0. ? 1. : 0.;
+        gl_Position = projectionMatrix*viewMatrix*w; gl_Position.z -= 0.0004*gl_Position.w; }`,
+    fragmentShader: 'uniform vec3 uCol; uniform float uOp; varying float vOk; void main(){ if (vOk < 0.5) discard; gl_FragColor = vec4(uCol, uOp); }',
+  });
+}
+// Tron look: dark glassy parts. No edge lines by default; the focused part (and the thin case outline) get a silhouette line.
 function styleParts() {
   const st = ST[4]; if (!st) return;
   Object.entries(st.parts).forEach(([id, pt]) => {
-    const kind = ORANGE.has(id) ? 'orange' : pt.def.caseShell || id === 'clip' ? 'shell' : id === 'pcb' ? 'pcb' : 'other';
-    const op = kind === 'shell' ? 0.55 : kind === 'pcb' ? 0.5 : 0.95;
-    pt.edgeMats = [];
+    const shell = !!pt.def.caseShell || id === 'clip';
+    pt.shell = shell; pt.edgeMats = [];
     const meshes = []; pt.body.traverse((o) => { if (o.isMesh) meshes.push(o); });
     meshes.forEach((o) => {
       const m = o.material;
-      if (!m.userData.dk) { m.userData.dk = 1; m.color.multiplyScalar(kind === 'shell' ? 0.8 : 0.52); if (m.roughness !== undefined) m.roughness = Math.min(1, m.roughness + 0.1); }
-      if (o.geometry.attributes.position.count > 600) return; // skip very round / dense shapes
-      const lm = new THREE.LineBasicMaterial({ color: EDGE[kind], transparent: true, opacity: op });
-      lm.userData.op = op; pt.edgeMats.push(lm);
-      const ln = new THREE.LineSegments(new THREE.EdgesGeometry(o.geometry, 28), lm);
-      ln.raycast = () => {}; o.add(ln);
+      if (!m.userData.dk) { m.userData.dk = 1; m.color.multiplyScalar(shell ? 0.8 : 0.52); if (m.roughness !== undefined) m.roughness = Math.min(1, m.roughness + 0.1); }
+      if (o.geometry.attributes.position.count > 6000) return;
+      const lm = silhouetteMaterial(shell ? EDGE.shell : EDGE.orange);
+      pt.edgeMats.push(lm);
+      const ln = new THREE.LineSegments(silhouetteGeometry(o.geometry), lm);
+      ln.raycast = () => {}; ln.frustumCulled = false; o.add(ln);
     });
   });
-  // lights a little softer so the glow reads
   scene.children.forEach((c) => { if (c.isLight) c.intensity *= 0.72; });
 }
 
@@ -1067,7 +1099,6 @@ function applyDim(pt) {
     m.opacity = u.o0.op * (1 - 0.96 * d); m.depthWrite = d > 0.001 ? false : u.o0.dw;
     if (tr !== m.transparent) { m.transparent = tr; m.needsUpdate = true; } // the shader differs for opaque materials
   });
-  (pt.edgeMats || []).forEach((m) => { m.opacity = m.userData.op * (1 - 0.97 * d); });
 }
 function embedStep(dt, now) {
   const { tgt, cur } = E; const k = 1 - Math.exp(-dt * E.speed);
@@ -1088,6 +1119,11 @@ function embedStep(dt, now) {
   Object.entries(ST[S.stage].parts).forEach(([id, pt]) => {
     const goal = E.focus && !E.focus.has(id) ? 1 : 0, d = pt.dim || 0;
     if (d !== goal) { pt.dim = E.snap || Math.abs(goal - d) < 0.002 ? goal : d + (goal - d) * k; applyDim(pt); }
+  });
+  // outline: the focused parts glow; with no focus only the case keeps a thin outline
+  Object.entries(ST[S.stage].parts).forEach(([id, pt]) => {
+    const op = E.focus ? (1 - (pt.dim || 0)) * (E.focus.has(id) ? 1 : 0) : (pt.shell ? 0.55 : 0);
+    (pt.edgeMats || []).forEach((m) => { m.uniforms.uOp.value = op; });
   });
   const sph = viewSphere();
   E.look.lerp(sph.c, E.snap ? 1 : k);

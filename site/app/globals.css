@@ -70,7 +70,6 @@ html.lenis, html.lenis body { height: auto; }
 
 @keyframes ring { from { transform: scale(0.35); opacity: 0.5; } to { transform: scale(1); opacity: 0; } }
 @keyframes breathe { 0%,100% { opacity: .75; transform: scale(1); } 50% { opacity: 1; transform: scale(1.06); } }
-@media (prefers-reduced-motion: reduce) { .ui-orb { animation: none !important; opacity: 0.3; } }
 
 /* ============================================================================================
    UI kit styles. Used only by components in components/ui. Pages never use these class names.
@@ -194,7 +193,6 @@ html.lenis, html.lenis body { height: auto; }
   /* ---- 3D stage and film dots ---- */
   /* Stage fade: all four edges melt into the black page, so the 3D stage never looks like a box. */
   .ui-stage-frame { @apply absolute inset-0 size-full border-0 transition-opacity duration-700; color-scheme: dark; --fade: linear-gradient(to right, transparent, #000 22%, #000 78%, transparent), linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent); -webkit-mask-image: var(--fade); mask-image: var(--fade); -webkit-mask-composite: source-in; mask-composite: intersect; }
-  .ui-orb { @apply size-24 rounded-full; background: radial-gradient(closest-side, color-mix(in srgb, var(--color-sun-deep) 35%, transparent), transparent); animation: breathe 5s ease-in-out infinite; }
   .ui-dots { @apply absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5; }
   .ui-dots i { @apply block h-1 w-1.5 rounded-full transition-all duration-300; background: color-mix(in srgb, var(--color-paper) 30%, transparent); }
   .ui-dots i.on { @apply w-6; background: var(--color-sun); box-shadow: 0 0 8px var(--color-sun); }

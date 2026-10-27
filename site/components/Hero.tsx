@@ -26,7 +26,7 @@ export default function Hero() {
 
   return (
     <section ref={root} id="overview" className="relative h-svh min-h-[620px] overflow-x-clip text-center">
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.2, delay: 0.4 }} className="absolute inset-x-0 bottom-0 top-[30%] [container-type:size] md:-bottom-[6%] md:top-[18%]">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.2, delay: 0.4 }} className="absolute inset-x-0 bottom-0 top-[44%] [container-type:size] md:top-[36%]">
         <Stage3D ref={stage} keepSpin initial={{ t: 0, yaw: 38, pitch: 14, spin: true, snap: true }} className="absolute inset-0" />
       </motion.div>
       <div className="pointer-events-none relative z-10 mx-auto flex max-w-[1080px] flex-col items-center px-5 pt-[calc(56px+3svh)]">
