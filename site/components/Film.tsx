@@ -75,7 +75,7 @@ export default function Film() {
   return (
     <section ref={root} id="film" className="relative" style={{ height: `${N * 100}svh` }}>
       <div className="sticky top-0 h-svh">
-        <Stage3D ref={stage} ret={2.5} initial={{ ...poseAt(0), snap: true }} className="absolute inset-x-0 bottom-0 top-[34%] md:bottom-0 md:left-[26%] md:right-0 md:top-[92px]" />
+        <Stage3D ref={stage} ret={2.5} initial={{ ...poseAt(0), snap: true }} className="absolute inset-x-0 bottom-0 top-[34%] md:bottom-0 md:left-[26%] md:right-0 md:top-[48px]" />
         <div className="pointer-events-none absolute inset-x-0 top-0 h-[36%] md:inset-y-0 md:right-auto md:h-full md:w-[40%]">
           <div className="relative h-full">
             {BEATS.map((b, i) => (

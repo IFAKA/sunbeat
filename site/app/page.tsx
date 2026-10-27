@@ -1,5 +1,5 @@
 import Smooth from "@/components/Smooth";
-import Nav, { LocalBar, REPO } from "@/components/Nav";
+import Nav, { REPO } from "@/components/Nav";
 import SolarGrid from "@/components/SolarGrid";
 import Hero from "@/components/Hero";
 import Film from "@/components/Film";
@@ -54,7 +54,6 @@ export default function Home() {
   return (
     <Smooth>
       <Nav />
-      <LocalBar />
       <main>
         <Hero />
         <section aria-label="Highlights" className="relative mx-auto flex max-w-[1080px] flex-col items-center px-5 pb-6 pt-[22svh] text-center">

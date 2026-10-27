@@ -50,7 +50,7 @@ export default function Hero() {
           ))}
         </div>
       </motion.div>
-      <div className="pointer-events-none relative z-10 mx-auto flex max-w-[1080px] flex-col items-center px-5 pt-[calc(92px+3svh)]">
+      <div className="pointer-events-none relative z-10 mx-auto flex max-w-[1080px] flex-col items-center px-5 pt-[calc(56px+3svh)]">
         <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 0.61, 0.36, 1] }} className="text-[clamp(34px,min(10vw,10.5vh),104px)] font-semibold leading-[1.02] tracking-[-0.04em] [text-wrap:balance]">
           Never <span className="glow-sun text-sun">charge.</span>
         </motion.h1>
