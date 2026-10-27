@@ -90,7 +90,7 @@ Two capacitor numbers were changed after this check (see FIXED rows). Done by we
 | B3U-3000P-B button | Exists, about 12,900 in stock | OK (the button is not used now; the earbud button is the control). |
 | RC0402FR-074M7L | Exists, 118,065 in stock at DigiKey | OK |
 | RC0402FR-075M1L | No DigiKey page found; broker sites show 10,000 to 28,000 | Check live stock. |
-| RC0402FR-076M2L (6.2 M) | No DigiKey page or stock found, only quote-request listings | RISK. Check the shop's own search; if missing, ask me for a value that is in stock and re-check R1 and R4a limits. |
+| RC0402FR-076M2L (6.2 M) | Real Yageo part, but only broker lots found (40,000 to 60,000, old date codes); no authorized shop stock seen | RISK. Fallback with no new risk: two resistors in series, 4.7 M (RC0402FR-074M7L, 118,065 in stock) + 1.5 M (RC0402FR-071M5L, 1%, exists; DigiKey stock not confirmed; the 5% version has 68,168 in stock but moves the limit) = 6.2 M. Needs 2 pads per resistor on the board. |
 
 Shipping to Spain: Mouser.es is confirmed (prices include duty, free shipping over about EUR 75, per its own page). Farnell and LCSC Spain terms were not found. Check the cart before paying.
 
