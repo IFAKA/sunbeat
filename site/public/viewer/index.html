@@ -74,6 +74,19 @@
   #panel .bar, #road .bar { background:#f5f5f7; color:#1d1d1f; }
   #panel button, #road button { background:#fff; color:#1d1d1f; border-color:#c5cdd6; }
   .rstep { background:#fff; }
+
+  /* Minimal controls */
+  #side { width:260px; padding:16px 14px; }
+  .seg { display:flex; background:#1c1c1e; border-radius:980px; padding:3px; margin-bottom:10px; gap:2px; }
+  .seg button { flex:1; border:0; background:transparent; padding:7px 4px; font-size:13px; color:#a1a1a6; }
+  .seg button.on { background:#2c2c2e; color:#fff; }
+  .seg button:hover { color:#fff; }
+  button.wide { width:100%; font-size:13px; }
+  #side h2 { margin:18px 0 6px; }
+  #size4 { left:14px; right:auto; top:auto; bottom:14px; border-radius:980px; padding:7px 14px; font-size:13px; }
+  #size4 b { font-size:14px; } #size4 .u { color:#a1a1a6; }
+  #scalehint { right:14px; bottom:14px; }
+  #card { left:auto; right:14px; bottom:auto; top:14px; }
 </style>
 <script type="importmap">
 { "imports": {
@@ -85,27 +98,24 @@
 <body>
 <div id="app">
   <aside id="side">
-    <h1>See it before you buy</h1>
-    <div class="tabs">
-      <button id="tab3">Step 3: test on your desk</button>
-      <button id="tab4">Step 4: big</button>
-      <button id="tab5">Step 4: mini<br><span style="font-size:12px;font-weight:600">Mini = the smallest build that plays your real songs.</span></button>
+    <div class="seg" id="tabs">
+      <button id="tab3">Desk test</button>
+      <button id="tab4">Big</button>
+      <button id="tab5">Mini</button>
     </div>
-    <div class="row"><button id="btnRoad">Roadmap</button></div>
-    <div class="intro" id="intro"></div>
-    <h2>View</h2>
-    <div class="row"><button id="vNormal">Normal</button><button id="vExploded">Exploded</button></div>
-    <div class="row"><button id="btnPanel"></button></div>
-    <div class="row"><button id="btnReset">Reset camera</button><button id="btnFront" style="display:none">Look from front</button></div>
-    <h2>Show</h2>
-    <label class="chk"><input type="checkbox" id="optNames" checked> Names on the parts</label>
-    <label class="chk"><input type="checkbox" id="optMinor"> Names of small parts too</label>
-    <label class="chk"><input type="checkbox" id="optGrid" checked> Grid and ruler (10 mm squares)</label>
-    <label class="chk" id="optSeeWrap"><input type="checkbox" id="optSee" checked> See-through case</label>
-    <h2>Parts (tick = visible)</h2>
-    <div class="row"><button id="allOn">All on</button><button id="allOff">All off</button></div>
+    <div class="seg">
+      <button id="vNormal">Normal</button>
+      <button id="vExploded">Exploded</button>
+    </div>
+    <button id="btnPanel" class="wide"></button>
+    <h2>Parts</h2>
     <div id="list"></div>
-    <div class="hint">Drag = turn. Scroll = zoom. Right-drag = move. Click a part to read about it.</div>
+    <div class="hint">Drag to turn. Scroll to zoom. Click a part to read about it.</div>
+    <div hidden>
+      <button id="btnRoad"></button><div id="intro"></div><button id="btnReset"></button><button id="btnFront"></button>
+      <input type="checkbox" id="optNames" checked><input type="checkbox" id="optMinor"><input type="checkbox" id="optGrid" checked>
+      <span id="optSeeWrap"><input type="checkbox" id="optSee" checked></span><button id="allOn"></button><button id="allOff"></button>
+    </div>
   </aside>
   <div id="main">
     <canvas id="gl"></canvas>
@@ -746,21 +756,9 @@ function setStage(n, keepCam) {
   $('btnFront').style.display = isDev(n) ? '' : 'none';
   $('size4').style.display = isDev(n) ? 'block' : 'none';
   $('btnPanel').textContent = n === 3 ? 'Show "how to wire it" picture' : 'Show circuit board picture';
-  $('scalehint').textContent = 'Real size in mm. Grid squares = 10 mm. Red ruler = 50 mm.';
+  $('scalehint').textContent = 'Grid squares are 10 mm';
   if (isDev(n)) {
-    const t = DEV.outD; const mine = n === 4 ? 'big' : 'mini'; const f1 = (v) => v.toFixed(1);
-    const row = (k, fn) => `<tr><td>${k}</td>${['big', 'mini'].map((c) => `<td${c === mine ? ' class="me"' : ''}>${fn(COMPARE[c])}</td>`).join('')}</tr>`;
-    $('size4').innerHTML = `Outside size of this device:<br><b>${DEV.outW.toFixed(1)} x ${DEV.outH.toFixed(1)} x ${t.toFixed(1)} mm</b> (W x H x D)<br><span style="font-size:12px;color:#556">${DEV.totalD.toFixed(1)} mm deep with the clip. Case wall ${DEV.wall} mm. Solar cell: ${DEV.cell.model}, ${DEV.cell.h} x ${DEV.cell.w} x ${DEV.cell.t} mm.</span>
-    <table class="cmp"><tr><th>Compare</th><th>big</th><th>mini</th></tr>
-    ${row('Outside size (mm)', (c) => `${f1(c.outW)} x ${f1(c.outH)} x ${f1(c.outD)}`)}
-    ${row('Volume (cm3)', (c) => f1(c.volume))}
-    ${row('Battery', (c) => c.bat)}
-    ${row('Battery energy (mWh)', (c) => Math.round(c.mwh))}
-    ${row('Solar cell area (cm2)', (c) => c.cellArea.toFixed(1))}
-    ${row('Solar power at 200 lux (uW)', (c) => '~' + Math.round(c.uW))}
-    ${row('Song memory', (c) => c.songMem)}
-    ${row('Songs from room light per day', (c) => c.songDay)}
-    </table><div style="font-size:11px;color:#556;margin-top:2px">Songs per day: estimate, not measured.</div>`;
+    $('size4').innerHTML = `<b>${DEV.outW.toFixed(1)} x ${DEV.outH.toFixed(1)} x ${DEV.outD.toFixed(1)} mm</b><span class="u">  (${DEV.totalD.toFixed(1)} mm deep with the clip)</span>`;
   }
   renderList(); applyExplode(); applyCaseOpacity(); refreshLabels(); if (!keepCam) resetCamera(); updatePanel(); updateRoad();
 }
