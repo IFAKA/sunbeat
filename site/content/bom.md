@@ -65,7 +65,7 @@ Basket: same shops as above. DigiKey.es part: about EUR 25 ex VAT. Add what is m
 
 ## Check of the parts (2026-10-27)
 
-Done by web search and page loads. DigiKey and Farnell block scripts, so their own pages were not opened; numbers come from search results. Nothing was ordered, so "can buy" means "a shop lists it", not "I received it".
+Two capacitor numbers must be changed before ordering (see PROBLEM rows). Done by web search and page loads. DigiKey and Farnell block scripts, so their own pages were not opened; numbers come from search results. Nothing was ordered, so "can buy" means "a shop lists it", not "I received it".
 
 | Part | Result | Note |
 |---|---|---|
@@ -77,7 +77,18 @@ Done by web search and page loads. DigiKey and Farnell block scripts, so their o
 | Keystone 3034TR holder | Exists, over 100,000 in stock on DigiKey sites | OK |
 | SJ-43514-SMT-TR jack | Exists, about 8,000 to 13,000 in stock on DigiKey.com | OK |
 | CH340E | Exists, LCSC shows 14,000 to 57,000 in stock (pages differ) | OK. Not at Mouser or DigiKey. |
-| Resistors, capacitors, inductor, USB-C, button | Not checked one by one | Common parts. DigiKey search links are not verified. |
+| GRM155R61A104KA01D (0.1 uF) | Exists, about 2.8 million in stock at DigiKey | OK |
+| GRM188R60J106ME47D (10 uF, 6.3 V) | Exists but DigiKey showed 0 in stock (restock date 2026-10-09 already passed) | PROBLEM. Use GRM188R60J106ME84D instead: same size and values, 29,362 in stock. |
+| GXT188R61A106KE13D (10 uF, 10 V) | No page found for this exact number | PROBLEM. Use GRT188R61A106KE13J (10 uF, 10 V, 0603): 233 in stock at DigiKey. |
+| CL21A226MQQNNNE (22 uF, 6.3 V, 0805) | Exists, active. LCSC about 3.8 million, also DigiKey, Farnell, TME | OK. DigiKey lead time is long (61 weeks), so buy where it is in stock. |
+| CL05A105KA5NQNC (1 uF) | Exists. TME about 99,000 in stock; LCSC showed 0 | OK, buy at TME. |
+| RC0402FR-071ML, -075K1L | Exist, DigiKey has stock (1.2 million for 1M) | OK |
+| RC0402FR-074K7L | Two DigiKey listings disagree (4.5 million vs out of stock until 2026-11-09) | Pick the listing that is in stock. |
+| CRCW04021M20FKED | Exists, Farnell lists it (cut tape 2141047) | OK |
+| VLS252012CX-100M-1 inductor | DigiKey.at: out of stock; TDK page shows DigiKey 760, Future 2,000, Oneyac 32,000 | Check live stock; fall back to Future Electronics. |
+| USB4105-GF-A USB-C | Exists, 30,000+ in stock | OK |
+| B3U-3000P-B button | Exists, about 12,900 in stock | OK (the button is not used now; the earbud button is the control). |
+| RC0402FR-076M2L, -075M1L, -074M7L | Not checked | Same Yageo series as the checked ones. |
 
 Shipping to Spain: Mouser.es is confirmed (prices include duty, free shipping over about EUR 75, per its own page). Farnell and LCSC Spain terms were not found. Check the cart before paying.
 
