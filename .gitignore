@@ -1,0 +1,11 @@
+__pycache__/
+*.wav
+*.adpcm
+log.csv
+.DS_Store
+node_modules/
+.next/
+.vercel
+*.tsbuildinfo
+next-env.d.ts
+earbud_trials.json
