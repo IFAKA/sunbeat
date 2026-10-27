@@ -42,7 +42,7 @@ Warnings: the TRRS boards may come with loose header pins (soldering needed) and
 | C8 100 nF | Song memory power | Murata GRM188R71C104KA01D (0603) | 3 (1+2) | DigiKey.es | not read (about 0.10) | not read | https://www.digikey.es/en/products/result?keywords=GRM188R71C104KA01D | Active (not re-checked) |
 | Audio jack | Earbud socket | Same Sky SJ-43514-SMT-TR | 2 (1+1) | DigiKey.es | EUR 1.35 | 10,933 | https://www.digikey.es/en/products/result?keywords=SJ-43514-SMT-TR | Active |
 | USB-C socket | Add songs from the laptop | GCT USB4105-GF-A | 2 (1+1) | DigiKey.es | EUR 0.71 | not shown | https://www.digikey.es/en/products/result?keywords=USB4105-GF-A | Active |
-| Side button | The one button | Omron/Aratas B3U-3000P-B | 2 (1+1) | DigiKey.es | about EUR 0.55 (USD 0.60) | 18,109 (earlier search) | https://www.digikey.es/en/products/result?keywords=B3U-3000P-B | Active |
+| Side button | Backup button (main control is the earbud button) | Omron/Aratas B3U-3000P-B | 2 (1+1) | DigiKey.es | about EUR 0.55 (USD 0.60) | 18,109 (earlier search) | https://www.digikey.es/en/products/result?keywords=B3U-3000P-B | Active |
 | USB chip | Laptop to Artemis serial | WCH CH340E (LCSC C99652) | 2 (1+1) | LCSC (Spain shipping NOT checked) | from USD 0.46 | 13,621 to 40,478 (two pages differ) | https://www.lcsc.com/product-detail/C99652.html | Active |
 | Brain | Plays the sound | SparkFun WRL-15484 Artemis module | 1 | SparkFun (or DigiKey.es) | USD 9.95 | In stock (SparkFun page) | https://www.sparkfun.com/products/15484 | Active |
 
